@@ -1,11 +1,11 @@
 package com.Brinah.FlightBooking.Entity;
 
+import com.Brinah.FlightBooking.Enum.FlightStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Entity
 @Getter
 @Setter
@@ -35,6 +35,16 @@ public class Flight {
 
     @ManyToOne
     private Route route;
+    @PrePersist
+    public void prePersist() {
+        if (status == null) {
+            status = FlightStatus.ACTIVE;
+        }
+    }
+
+
+    @Enumerated(EnumType.STRING)
+    private FlightStatus status; // <-- ADDED FIELD
 
     @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Seat> seats;

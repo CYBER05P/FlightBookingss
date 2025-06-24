@@ -1,8 +1,8 @@
 package com.Brinah.FlightBooking.Entity;
+
 import com.Brinah.FlightBooking.Enum.SeatClass;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 @Entity
 @Getter
@@ -21,9 +21,12 @@ public class Seat {
     @Enumerated(EnumType.STRING)
     private SeatClass seatClass;
 
-    @Column(name = "is_available")
-    private Boolean available;
+    private double price;
 
-    @ManyToOne
+    @Column(name = "is_available", nullable = false)
+    private Boolean available = true; // default true when generated
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "flight_id")
     private Flight flight;
 }

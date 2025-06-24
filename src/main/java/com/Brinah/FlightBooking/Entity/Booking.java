@@ -1,10 +1,10 @@
 package com.Brinah.FlightBooking.Entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,8 +26,11 @@ public class Booking {
     @ManyToOne
     private Flight flight;
 
-    @OneToOne
-    private Seat seat;
+    // ✅ Multiple assigned seats
+    @OneToMany
+    private List<Seat> seats;
 
     private LocalDateTime bookingTime;
+
+    private double totalPrice;
 }

@@ -1,24 +1,27 @@
 package com.Brinah.FlightBooking.Service.Impl;
 
 import com.Brinah.FlightBooking.DTO.BookingDto;
+import com.Brinah.FlightBooking.DTO.BookingRequest;
 import com.Brinah.FlightBooking.Entity.Booking;
 import com.Brinah.FlightBooking.Entity.Flight;
 import com.Brinah.FlightBooking.Entity.Seat;
 import com.Brinah.FlightBooking.Entity.User;
+import com.Brinah.FlightBooking.Enum.SeatClass;
 import com.Brinah.FlightBooking.Exception.ResourceNotFoundException;
 import com.Brinah.FlightBooking.Repositories.BookingRepository;
 import com.Brinah.FlightBooking.Repositories.FlightRepository;
 import com.Brinah.FlightBooking.Repositories.SeatRepository;
 import com.Brinah.FlightBooking.Repositories.UserRepository;
+import com.Brinah.FlightBooking.Service.EmailService;
 import com.Brinah.FlightBooking.Service.Interface.BookingService;
 import com.Brinah.FlightBooking.Utils.ModelMapperUtil;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,35 +33,71 @@ public class BookingServiceImpl implements BookingService {
     private final SeatRepository seatRepository;
     private final UserRepository userRepository;
     private final ModelMapperUtil modelMapper;
+    private final EmailService emailService;
 
-    @Override
     @Transactional
-    public BookingDto bookFlight(Long flightId, Long seatId, String userEmail) {
-        Flight flight = flightRepository.findById(flightId)
-                .orElseThrow(() -> new ResourceNotFoundException("Flight", "ID", flightId));
+    @Override
+    public BookingDto bookFlight(BookingRequest request) {
+        Flight flight = flightRepository.findById(request.getFlightId())
+                .orElseThrow(() -> new ResourceNotFoundException("Flight", "ID", request.getFlightId()));
 
-        Seat seat = seatRepository.findById(seatId)
-                .orElseThrow(() -> new ResourceNotFoundException("Seat", "ID", seatId));
+        User user = userRepository.findByEmail(request.getUserEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.getUserEmail()));
 
-        if (!seat.getAvailable()) {
-            throw new ResourceNotFoundException.SeatAlreadyBookedException(seat.getId());
+        int totalPassengers = request.getNumberOfAdults() + request.getNumberOfChildren();
+
+        List<Seat> availableSeats = seatRepository.findByFlightIdAndSeatClassAndAvailableTrue(
+                flight.getId(), request.getSeatClass()
+        );
+
+        if (availableSeats.size() < totalPassengers) {
+            throw new IllegalStateException("Not enough available " + request.getSeatClass() + " seats.");
         }
 
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userEmail));
+        // Random seat assignment
+        Collections.shuffle(availableSeats);
+        List<Seat> assignedSeats = availableSeats.subList(0, totalPassengers);
 
-        seat.setAvailable(false);
-        seatRepository.save(seat);
+        // Mark seats as unavailable
+        assignedSeats.forEach(seat -> seat.setAvailable(false));
+        seatRepository.saveAll(assignedSeats);
 
+        // Price calculation
+        double pricePerSeat = switch (request.getSeatClass()) {
+            case FIRST -> 500.0;
+            case BUSINESS -> 350.0;
+            case ECONOMY -> 200.0;
+        };
+        double totalPrice = pricePerSeat * totalPassengers;
+
+        // Save booking
         Booking booking = new Booking();
         booking.setUser(user);
         booking.setFlight(flight);
-        booking.setSeat(seat);
+        booking.setSeats(assignedSeats);
         booking.setBookingTime(LocalDateTime.now());
         booking.setConfirmationCode(generateConfirmationCode());
+        booking.setTotalPrice(totalPrice);
 
-        Booking saved = bookingRepository.save(booking);
-        return modelMapper.toBookingDto(saved);
+        Booking savedBooking = bookingRepository.save(booking);
+
+        // Prepare response
+        BookingDto dto = modelMapper.toBookingDto(savedBooking);
+
+        // Send email with QR code
+        try {
+            emailService.sendBookingReceipt(dto, user.getEmail());
+        } catch (MessagingException e) {
+            System.err.println("Failed to send booking email: " + e.getMessage());
+        }
+
+        return dto;
+    }
+
+    @Override
+    public BookingDto bookFlight(Long flightId, Long seatId, String userEmail) {
+        // Deprecated in favor of BookingRequest approach
+        return null;
     }
 
     @Override
@@ -71,10 +110,10 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Unauthorized to cancel this booking.");
         }
 
-        Seat seat = booking.getSeat();
-        if (seat != null) {
-            seat.setAvailable(true);
-            seatRepository.save(seat);
+        List<Seat> seats = booking.getSeats();
+        if (seats != null) {
+            seats.forEach(seat -> seat.setAvailable(true));
+            seatRepository.saveAll(seats);
         }
 
         bookingRepository.deleteById(bookingId);
