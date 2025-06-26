@@ -32,5 +32,7 @@ public class Booking {
 
     private LocalDateTime bookingTime;
 
-    private double totalPrice;
+    @Column(name = "total_price")
+    private Double totalPrice;
+
 }

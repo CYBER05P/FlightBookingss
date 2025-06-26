@@ -2,7 +2,10 @@ package com.Brinah.FlightBooking.Repositories;
 
 import com.Brinah.FlightBooking.Entity.Booking;
 import com.Brinah.FlightBooking.Entity.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +22,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     // Optional: Fetch by confirmation code
     Optional<Booking> findByConfirmationCode(String confirmationCode);
+    void deleteByFlightId(Long flightId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Booking")
+    void deleteAllBookings();
+
 }

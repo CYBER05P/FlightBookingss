@@ -14,5 +14,7 @@ public interface BookingService {
     BookingDto bookFlight(Long flightId, Long seatId, String userEmail);
     void cancelBooking(Long bookingId, String userEmail);
     List<BookingDto> getBookingsForUser(String userEmail);
-    List<BookingDto> getAllBookings(); // For Admin
+    List<BookingDto> getAllBookings();
+    List<BookingDto> getBookingsByUserId(Long userId);
+// For Admin
 }

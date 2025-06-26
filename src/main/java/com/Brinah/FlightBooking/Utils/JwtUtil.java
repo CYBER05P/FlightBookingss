@@ -2,22 +2,24 @@ package com.Brinah.FlightBooking.Utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+
     private static final String SECRET = "brinahairlinesjwtsecretkey1234567890brinahairlinesjwtsecretkey";
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
 
-    private final Key key;
+    private SecretKey key;
 
-    public JwtUtil() {
+    @PostConstruct
+    public void init() {
         this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
@@ -31,11 +33,15 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith((SecretKey) key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new RuntimeException("Invalid or expired JWT token", e);
+        }
     }
 
     public String generateToken(String username, String role) {
@@ -54,7 +60,7 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token, String userDetailsUsername) {
         final String username = extractUsername(token);
-        return (username.equals(userDetailsUsername)) && !isTokenExpired(token);
+        return username.equals(userDetailsUsername) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

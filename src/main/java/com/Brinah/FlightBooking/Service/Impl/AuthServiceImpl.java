@@ -46,10 +46,12 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
 
         return AuthResponse.builder()
+                .email(user.getEmail())
                 .token(token)
                 .Message("Registration successful")
                 .role(user.getRole().name())
                 .build();
+
     }
 
     @Override
@@ -64,9 +66,17 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
 
         return AuthResponse.builder()
+                .name(user.getName())
+                .idOrPassport(user.getIdOrPassportNumber())
+                .dateOfBirth(user.getDateOfBirth())
+                .country(user.getCountry())
+                .email(user.getEmail())
                 .token(token)
                 .Message("Login successful")
                 .role(user.getRole().name())
                 .build();
+
     }
 }
+
+        

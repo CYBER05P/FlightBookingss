@@ -24,6 +24,14 @@ public class Flight {
 
     private LocalDateTime arrivalTime;
 
+    private Double economyPrice;
+
+    private Double businessPrice;
+
+    private Double firstClassPrice;
+
+
+
     @ManyToOne
     private Aircraft aircraft;
 
@@ -33,8 +41,7 @@ public class Flight {
     @ManyToOne
     private Airport arrivalAirport;
 
-    @ManyToOne
-    private Route route;
+
     @PrePersist
     public void prePersist() {
         if (status == null) {

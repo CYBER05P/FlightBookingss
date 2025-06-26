@@ -1,8 +1,6 @@
 package com.Brinah.FlightBooking.Service.Impl;
 
-import com.Brinah.FlightBooking.DTO.FlightDto;
-import com.Brinah.FlightBooking.DTO.FlightResponse;
-import com.Brinah.FlightBooking.DTO.FlightSearchRequest;
+import com.Brinah.FlightBooking.DTO.*;
 import com.Brinah.FlightBooking.Entity.*;
 import com.Brinah.FlightBooking.Enum.FlightStatus;
 import com.Brinah.FlightBooking.Exception.ResourceNotFoundException;
@@ -10,6 +8,7 @@ import com.Brinah.FlightBooking.Repositories.*;
 import com.Brinah.FlightBooking.Service.Interface.FlightService;
 import com.Brinah.FlightBooking.Utils.ModelMapperUtil;
 import com.Brinah.FlightBooking.Utils.SeatGenerator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,31 +22,43 @@ public class FlightServiceImpl implements FlightService {
     private final FlightRepository flightRepository;
     private final AirportRepository airportRepository;
     private final AircraftRepository aircraftRepository;
-    private final RouteRepository routeRepository;
     private final SeatRepository seatRepository;
+    private final BookingRepository bookingRepository; // ✅ Injected here
     private final SeatGenerator seatGenerator;
     private final ModelMapperUtil modelMapper;
 
-
     @Override
-    public FlightDto createFlight(FlightDto flightDto) {
-        Aircraft aircraft = aircraftRepository.findById(flightDto.getAircraftId())
-                .orElseThrow(() -> new ResourceNotFoundException("Aircraft", "ID", flightDto.getAircraftId()));
+    public FlightDto createFlight(FlightCreationDto flightDto) {
+        Aircraft aircraft = aircraftRepository.findByModel(flightDto.getAircraftModel())
+                .orElseGet(() -> {
+                    Aircraft newAircraft = new Aircraft();
+                    newAircraft.setModel(flightDto.getAircraftModel());
+                    return aircraftRepository.save(newAircraft);
+                });
 
-        Airport departureAirport = airportRepository.findById(flightDto.getDepartureAirportId())
-                .orElseThrow(() -> new ResourceNotFoundException("Departure Airport", "ID", flightDto.getDepartureAirportId()));
+        Airport departureAirport = airportRepository.findByNameAndCityAndCountry(
+                flightDto.getDepartureAirportName(),
+                flightDto.getDepartureCity(),
+                flightDto.getDepartureCountry()
+        ).orElseGet(() -> {
+            Airport newAirport = new Airport();
+            newAirport.setName(flightDto.getDepartureAirportName());
+            newAirport.setCity(flightDto.getDepartureCity());
+            newAirport.setCountry(flightDto.getDepartureCountry());
+            return airportRepository.save(newAirport);
+        });
 
-        Airport arrivalAirport = airportRepository.findById(flightDto.getArrivalAirportId())
-                .orElseThrow(() -> new ResourceNotFoundException("Arrival Airport", "ID", flightDto.getArrivalAirportId()));
-
-        Route route = routeRepository.findById(flightDto.getRouteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Route", "ID", flightDto.getRouteId()));
-
-        // Set aircraft for route if not yet assigned
-        if (route.getAircraft() == null) {
-            route.setAircraft(aircraft);
-            route = routeRepository.save(route);
-        }
+        Airport arrivalAirport = airportRepository.findByNameAndCityAndCountry(
+                flightDto.getArrivalAirportName(),
+                flightDto.getArrivalCity(),
+                flightDto.getArrivalCountry()
+        ).orElseGet(() -> {
+            Airport newAirport = new Airport();
+            newAirport.setName(flightDto.getArrivalAirportName());
+            newAirport.setCity(flightDto.getArrivalCity());
+            newAirport.setCountry(flightDto.getArrivalCountry());
+            return airportRepository.save(newAirport);
+        });
 
         Flight flight = Flight.builder()
                 .flightNumber(flightDto.getFlightNumber())
@@ -56,13 +67,15 @@ public class FlightServiceImpl implements FlightService {
                 .departureAirport(departureAirport)
                 .arrivalAirport(arrivalAirport)
                 .aircraft(aircraft)
-                .route(route)
-                .status(FlightStatus.ACTIVE) // ✅ Ensuring status is not null
+                .economyPrice(flightDto.getEconomyPrice())
+                .businessPrice(flightDto.getBusinessPrice())
+                .firstClassPrice(flightDto.getFirstClassPrice())
+                .status(flightDto.getFlightStatus() != null ? flightDto.getFlightStatus() : FlightStatus.ACTIVE)
                 .build();
 
         Flight savedFlight = flightRepository.save(flight);
 
-        // Generate and persist seats
+        // Generate seats
         List<Seat> seats = seatGenerator.generateSeatsForFlight(savedFlight);
         seatRepository.saveAll(seats);
 
@@ -98,9 +111,6 @@ public class FlightServiceImpl implements FlightService {
                 .collect(Collectors.toList());
     }
 
-
-
-
     @Override
     public void deleteFlight(Long id) {
         if (!flightRepository.existsById(id)) {
@@ -109,39 +119,29 @@ public class FlightServiceImpl implements FlightService {
         flightRepository.deleteById(id);
     }
 
-    public AirportRepository getAirportRepository() {
-        return airportRepository;
+    @Transactional
+    @Override
+    public void deleteAllFlights() {
+        bookingRepository.deleteAllBookings();  // ✅ Step 1: delete all bookings
+        flightRepository.deleteAll();           // ✅ Step 2: delete all flights
     }
 
-    /**
-     * Converts a Flight entity to a user-friendly FlightDto.
-     */
     private FlightDto convertToDto(Flight flight) {
         FlightDto dto = new FlightDto();
         dto.setId(flight.getId());
         dto.setFlightNumber(flight.getFlightNumber());
         dto.setDepartureTime(flight.getDepartureTime());
         dto.setArrivalTime(flight.getArrivalTime());
-
         dto.setDepartureAirportCode(flight.getDepartureAirport().getCode());
         dto.setDepartureAirportCity(flight.getDepartureAirport().getCity());
-
         dto.setArrivalAirportCode(flight.getArrivalAirport().getCode());
         dto.setArrivalAirportCity(flight.getArrivalAirport().getCity());
-
         dto.setAircraftModel(flight.getAircraft().getModel());
         dto.setAircraftId(flight.getAircraft().getId());
-
-        dto.setEconomyPrice(flight.getRoute().getEconomyPrice());
-        dto.setBusinessPrice(flight.getRoute().getBusinessPrice());
-        dto.setFirstClassPrice(flight.getRoute().getFirstClassPrice());
-
-        if (flight.getStatus() != null) {
-            dto.setFlightStatus(flight.getStatus().name());
-        } else {
-            dto.setFlightStatus("UNKNOWN");
-        }
-
+        dto.setEconomyPrice(flight.getEconomyPrice());
+        dto.setBusinessPrice(flight.getBusinessPrice());
+        dto.setFirstClassPrice(flight.getFirstClassPrice());
+        dto.setFlightStatus(flight.getStatus() != null ? flight.getStatus().name() : "UNKNOWN");
         return dto;
     }
 }

@@ -49,11 +49,10 @@ public class BookingController {
         return ResponseEntity.ok("Booking cancelled");
     }
 
-    // ✅ View current user's bookings
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @GetMapping("/my")
-    public ResponseEntity<List<BookingDto>> myBookings(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(bookingService.getBookingsForUser(userDetails.getUsername()));
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BookingDto>> getBookingsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(bookingService.getBookingsByUserId(userId));
     }
 
     // ✅ Download ticket PDF

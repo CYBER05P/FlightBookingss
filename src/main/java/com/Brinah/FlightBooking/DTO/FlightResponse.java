@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class FlightResponse {
+    private Long flightId; // ✅ Java convention: camelCase
 
     private String flightNumber;
 
@@ -26,11 +27,11 @@ public class FlightResponse {
     // Aircraft
     private String aircraftModel;
 
-    // Prices for each seat class
+    // Prices
     private double economyPrice;
     private double businessPrice;
     private double firstClassPrice;
 
-    // Flight status (ACTIVE, CANCELLED, DELAYED, etc.)
+    // Status
     private String flightStatus;
 }

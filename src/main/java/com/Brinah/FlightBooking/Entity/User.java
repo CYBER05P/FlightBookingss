@@ -41,6 +41,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false)
+    private boolean subscribedToNotifications = false;
+
+
     private boolean enabled;
 
     // UserDetails methods

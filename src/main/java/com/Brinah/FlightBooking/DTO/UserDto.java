@@ -13,6 +13,7 @@ public class UserDto {
     private LocalDate dateOfBirth;
     private String country;
     private Role role;
+    private boolean subscribedToNotifications;
     private boolean enabled;
     // Inside UserDto.java
     public String getIdOrEmail() {

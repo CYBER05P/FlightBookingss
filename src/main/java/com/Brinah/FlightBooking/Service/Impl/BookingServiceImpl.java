@@ -63,11 +63,13 @@ public class BookingServiceImpl implements BookingService {
         seatRepository.saveAll(assignedSeats);
 
         // Price calculation
+        // Price calculation using flight's pricing config
         double pricePerSeat = switch (request.getSeatClass()) {
-            case FIRST -> 500.0;
-            case BUSINESS -> 350.0;
-            case ECONOMY -> 200.0;
+            case FIRST -> flight.getFirstClassPrice();
+            case BUSINESS -> flight.getBusinessPrice();
+            case ECONOMY -> flight.getEconomyPrice();
         };
+
         double totalPrice = pricePerSeat * totalPassengers;
 
         // Save booking
@@ -99,6 +101,14 @@ public class BookingServiceImpl implements BookingService {
         // Deprecated in favor of BookingRequest approach
         return null;
     }
+    @Override
+    public List<BookingDto> getBookingsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "ID", userId));
+        List<Booking> bookings = bookingRepository.findByUser(user);
+        return bookings.stream().map(modelMapper::toBookingDto).toList();
+    }
+
 
     @Override
     @Transactional
