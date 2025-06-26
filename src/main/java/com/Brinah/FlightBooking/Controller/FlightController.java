@@ -1,5 +1,6 @@
 package com.Brinah.FlightBooking.Controller;
 
+import com.Brinah.FlightBooking.DTO.FlightCreationDto;
 import com.Brinah.FlightBooking.DTO.FlightDto;
 import com.Brinah.FlightBooking.DTO.FlightResponse;
 import com.Brinah.FlightBooking.DTO.FlightSearchRequest;
@@ -10,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/flights")
 @RequiredArgsConstructor
@@ -17,33 +19,49 @@ public class FlightController {
 
     private final FlightService flightService;
 
+    /**
+     * Create a new flight (Admin only).
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<FlightDto> create(@RequestBody FlightDto dto) {
+    public ResponseEntity<FlightDto> createFlight(@RequestBody FlightCreationDto dto) {
         return ResponseEntity.ok(flightService.createFlight(dto));
     }
 
+
+    /**
+     * Get all flights (Admin & Customer).
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping
-    public ResponseEntity<List<FlightDto>> getAll() {
+    public ResponseEntity<List<FlightDto>> getAllFlights() {
         return ResponseEntity.ok(flightService.getAllFlights());
     }
 
+    /**
+     * Get a flight by ID (Admin & Customer).
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
-    @GetMapping("/{id:[0-9]+}") // ✅ restricts to numeric IDs only
-    public ResponseEntity<FlightDto> getById(@PathVariable Long id) {
+    @GetMapping("/{id:[0-9]+}")
+    public ResponseEntity<FlightDto> getFlightById(@PathVariable Long id) {
         return ResponseEntity.ok(flightService.getFlightById(id));
     }
 
+    /**
+     * Delete a flight (Admin only).
+     */
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id:[0-9]+}") // ✅ same for delete
-    public ResponseEntity<String> delete(@PathVariable Long id) {
+    @DeleteMapping("/{id:[0-9]+}")
+    public ResponseEntity<String> deleteFlight(@PathVariable Long id) {
         flightService.deleteFlight(id);
         return ResponseEntity.ok("Flight deleted");
     }
 
+    /**
+     * Search available flights (Admin & Customer).
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
-    @PostMapping("/search") // ✅ works now — no ambiguity with {id}
+    @PostMapping("/search")
     public ResponseEntity<?> searchFlights(@RequestBody FlightSearchRequest request) {
         List<FlightResponse> results = flightService.searchFlights(request);
         if (results.isEmpty()) {

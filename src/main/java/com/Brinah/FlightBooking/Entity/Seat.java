@@ -21,7 +21,9 @@ public class Seat {
     @Enumerated(EnumType.STRING)
     private SeatClass seatClass;
 
-    private double price;
+    @Column
+    private Double price;
+
 
     @Column(name = "is_available", nullable = false)
     private Boolean available = true; // default true when generated

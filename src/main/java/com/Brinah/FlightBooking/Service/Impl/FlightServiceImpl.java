@@ -1,5 +1,6 @@
 package com.Brinah.FlightBooking.Service.Impl;
 
+import com.Brinah.FlightBooking.DTO.FlightCreationDto;
 import com.Brinah.FlightBooking.DTO.FlightDto;
 import com.Brinah.FlightBooking.DTO.FlightResponse;
 import com.Brinah.FlightBooking.DTO.FlightSearchRequest;
@@ -28,9 +29,8 @@ public class FlightServiceImpl implements FlightService {
     private final SeatGenerator seatGenerator;
     private final ModelMapperUtil modelMapper;
 
-
     @Override
-    public FlightDto createFlight(FlightDto flightDto) {
+    public FlightDto createFlight(FlightCreationDto flightDto) {
         Aircraft aircraft = aircraftRepository.findById(flightDto.getAircraftId())
                 .orElseThrow(() -> new ResourceNotFoundException("Aircraft", "ID", flightDto.getAircraftId()));
 
@@ -40,16 +40,18 @@ public class FlightServiceImpl implements FlightService {
         Airport arrivalAirport = airportRepository.findById(flightDto.getArrivalAirportId())
                 .orElseThrow(() -> new ResourceNotFoundException("Arrival Airport", "ID", flightDto.getArrivalAirportId()));
 
-        Route route = routeRepository.findById(flightDto.getRouteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Route", "ID", flightDto.getRouteId()));
+        // 🛫 Dynamically create Route
+        Route route = Route.builder()
+                .economyPrice(flightDto.getEconomyPrice())
+                .businessPrice(flightDto.getBusinessPrice())
+                .firstClassPrice(flightDto.getFirstClassPrice())
+                .aircraft(aircraft)
+                .build();
+        route = routeRepository.save(route);
 
-        // Set aircraft for route if not yet assigned
-        if (route.getAircraft() == null) {
-            route.setAircraft(aircraft);
-            route = routeRepository.save(route);
-        }
-
+        // ✈️ Create Flight
         Flight flight = Flight.builder()
+                .id(flightDto.getId()) // Optional, can be null for new flights
                 .flightNumber(flightDto.getFlightNumber())
                 .departureTime(flightDto.getDepartureTime())
                 .arrivalTime(flightDto.getArrivalTime())
@@ -57,12 +59,11 @@ public class FlightServiceImpl implements FlightService {
                 .arrivalAirport(arrivalAirport)
                 .aircraft(aircraft)
                 .route(route)
-                .status(FlightStatus.ACTIVE) // ✅ Ensuring status is not null
+                .status(FlightStatus.ACTIVE)
                 .build();
-
         Flight savedFlight = flightRepository.save(flight);
 
-        // Generate and persist seats
+        // 💺 Generate and persist seats
         List<Seat> seats = seatGenerator.generateSeatsForFlight(savedFlight);
         seatRepository.saveAll(seats);
 
@@ -98,9 +99,6 @@ public class FlightServiceImpl implements FlightService {
                 .collect(Collectors.toList());
     }
 
-
-
-
     @Override
     public void deleteFlight(Long id) {
         if (!flightRepository.existsById(id)) {
@@ -109,13 +107,7 @@ public class FlightServiceImpl implements FlightService {
         flightRepository.deleteById(id);
     }
 
-    public AirportRepository getAirportRepository() {
-        return airportRepository;
-    }
-
-    /**
-     * Converts a Flight entity to a user-friendly FlightDto.
-     */
+    // ✨ Helper to convert Flight to DTO
     private FlightDto convertToDto(Flight flight) {
         FlightDto dto = new FlightDto();
         dto.setId(flight.getId());
@@ -125,7 +117,6 @@ public class FlightServiceImpl implements FlightService {
 
         dto.setDepartureAirportCode(flight.getDepartureAirport().getCode());
         dto.setDepartureAirportCity(flight.getDepartureAirport().getCity());
-
         dto.setArrivalAirportCode(flight.getArrivalAirport().getCode());
         dto.setArrivalAirportCity(flight.getArrivalAirport().getCity());
 
@@ -136,11 +127,7 @@ public class FlightServiceImpl implements FlightService {
         dto.setBusinessPrice(flight.getRoute().getBusinessPrice());
         dto.setFirstClassPrice(flight.getRoute().getFirstClassPrice());
 
-        if (flight.getStatus() != null) {
-            dto.setFlightStatus(flight.getStatus().name());
-        } else {
-            dto.setFlightStatus("UNKNOWN");
-        }
+        dto.setFlightStatus(flight.getStatus() != null ? flight.getStatus().name() : "UNKNOWN");
 
         return dto;
     }
