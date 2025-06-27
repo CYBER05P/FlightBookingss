@@ -1,23 +1,24 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import axios from "../axiosConfig";
 import { FaMapMarkerAlt, FaCalendarAlt, FaSearch } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const SearchForm = () => {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [departureDate, setDepartureDate] = useState("");
-  const [loading, setLoading] = useState(false);
   const [airports, setAirports] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Fetch available airports
   useEffect(() => {
     const fetchAirports = async () => {
       try {
-        const res = await axios.post("http://192.168.1.143:8085/api/flights/search");
-        console.log("Fetched airport data:", res.data);  
+        const res = await axios.get("http://192.168.1.143:8085/api/flights/airports");
         setAirports(res.data);
       } catch (err) {
-        console.error("Could not fetch airports", err);
+        console.error("Failed to fetch airports:", err);
       }
     };
     fetchAirports();
@@ -33,13 +34,13 @@ const SearchForm = () => {
 
     try {
       const response = await axios.post("http://192.168.1.143:8085/api/flights/search", {
-        from,       
+        from,
         to,
-        departureDate,
+        date: departureDate,
       });
 
       console.log("Search results:", response.data);
-      // navigate('/results', { state: response.data });
+      navigate('/flights', { state: response.data });  // Correct navigation
     } catch (err) {
       console.error("Search failed", err);
       alert("Something went wrong. Please try again.");
@@ -49,89 +50,76 @@ const SearchForm = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-xl">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* From Dropdown */}
-        <div className="relative">
-          <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-400" />
-          <select
+    <motion.div
+      className="backdrop-blur-lg bg-white/70 p-10 rounded-2xl shadow-2xl max-w-4xl mx-auto"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <h2 className="text-3xl font-bold text-center mb-8 text-blue-700">
+        Find Your Perfect Flight
+      </h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div className="relative group">
+          <FaMapMarkerAlt className="absolute left-4 top-4 text-gray-400" />
+          <input
+            list="fromAirports"
+            placeholder="From (City, Airport, or Country)"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
-            className="pl-10 p-3 border rounded-full w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">From</option>
+            className="pl-12 p-4 border border-gray-300 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <datalist id="fromAirports">
             {airports.map((airport, idx) => (
-              <option key={idx} value={airport.code}>
-                {airport.location} ({airport.code})
-              </option>
+              <option key={idx} value={`${airport.location} (${airport.code})`} />
             ))}
-          </select>
+          </datalist>
         </div>
 
-        {/* To Dropdown */}
-        <div className="relative">
-          <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-400" />
-          <select
+        <div className="relative group">
+          <FaMapMarkerAlt className="absolute left-4 top-4 text-gray-400" />
+          <input
+            list="toAirports"
+            placeholder="To (City, Airport, or Country)"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            className="pl-10 p-3 border rounded-full w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">To</option>
+            className="pl-12 p-4 border border-gray-300 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <datalist id="toAirports">
             {airports.map((airport, idx) => (
-              <option key={idx} value={airport.code}>
-                {airport.location} ({airport.code})
-              </option>
+              <option key={idx} value={`${airport.location} (${airport.code})`} />
             ))}
-          </select>
+          </datalist>
         </div>
 
-        {/* Date to Pick */}
-        <div className="relative">
-          <FaCalendarAlt className="absolute left-3 top-3 text-gray-400" />
+        <div className="relative group">
+          <FaCalendarAlt className="absolute left-4 top-4 text-gray-400" />
           <input
             type="date"
             value={departureDate}
             onChange={(e) => setDepartureDate(e.target.value)}
-            className="pl-10 p-3 border rounded-full w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="pl-12 p-4 border border-gray-300 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
 
-      {/* Search Button */}
-      <button
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.98 }}
         onClick={handleSearch}
         disabled={loading}
-        className="mt-5 flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 font-semibold w-full transition-colors"
+        className="mt-8 flex items-center justify-center gap-3 bg-blue-600 text-white px-8 py-4 rounded-full hover:bg-blue-700 font-semibold w-full"
       >
-        {loading ? (
-          <svg
-            className="animate-spin h-5 w-5 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-            />
-          </svg>
-        ) : (
+        {loading ? "Searching..." : (
           <>
             <FaSearch />
             Search Flights
           </>
         )}
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 };
 

@@ -1,7 +1,6 @@
-// homePage.jsx
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaPlaneDeparture, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaUser } from "react-icons/fa";
+import { FaPlaneDeparture, FaSearch, FaUser } from "react-icons/fa";
 import SpecialOffers from "../components/SpecialOffers";
 import Testimonials from "../components/Testimonials";
 import FlightStatus from "../components/FlightStatus";
@@ -9,6 +8,7 @@ import TravelTips from "../components/TravelTips";
 import Newsletter from "../components/Newsletter";
 import FAQ from "../components/FAQ";
 import SearchForm from "../components/SearchForm";
+import NavBar from "../components/NavBar"; // ✅ Import the new Navbar
 
 const flightPromos = [
   {
@@ -41,7 +41,7 @@ const popularDestinations = [
   { name: "Malindi", image: "/images/Malindi.jpg", price: "From KSH 6,200" },
 ];
 
-export default function Home() {
+export default function HomePage() {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -53,30 +53,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Navbar */}
-      <header className="flex items-center justify-between p-6 shadow bg-white sticky top-0 z-50">
-        <div className="flex items-center space-x-2">
-          <FaPlaneDeparture className="text-blue-600 text-2xl" />
-          <span className="font-bold text-xl text-gray-800">FMS Airways</span>
-        </div>
-        
-        <nav className="hidden md:flex space-x-6">
-          <Link to="/" className="hover:text-blue-600 font-medium">Home</Link>
-          <Link to="/flights" className="hover:text-blue-600 font-medium">Search Flights</Link>
-          <Link to="/about" className="hover:text-blue-600 font-medium">About</Link>
-          <Link to="/contact" className="hover:text-blue-600 font-medium">Contact</Link>
-          <Link to="/login">
-            <button className="ml-4 border border-blue-600 text-blue-600 px-4 py-1 rounded hover:bg-blue-600 hover:text-white transition">
-              Login
-            </button>
-          </Link>
-        </nav>
-      </header>
+      
+      <NavBar /> {/* ✅ Reusable NavBar at the top */}
 
       {/* Hero Section with Flight Search */}
       <section className="relative flex-1 flex flex-col items-center justify-center text-center bg-gradient-to-r from-blue-500 to-cyan-500 p-8 pt-16">
         <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="relative z-10 max-w-4xl mx-auto"></div>
+        <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
             Your Journey Begins Here
           </h1>
@@ -86,7 +69,7 @@ export default function Home() {
           
           {/* Flight Search Box */}
           <SearchForm />
-
+        </div>
       </section>
 
       {/* Flight Offers Banner Carousel */}
@@ -182,22 +165,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Special Offers Component */}
+      {/* Additional Components */}
       <SpecialOffers />
-
-      {/* Testimonials Component */}
       <Testimonials />
-
-      {/* Flight Status Component */}
       <FlightStatus />
-
-      {/* Travel Tips Component */}
       <TravelTips />
-
-      {/* FAQ Component */}
       <FAQ />
-
-      {/* Newsletter to Component */}
       <Newsletter />
 
       {/* Call to Action */}
@@ -206,7 +179,7 @@ export default function Home() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready for Your Next Adventure?</h2>
           <p className="text-lg mb-6">Sign up now and get exclusive deals and discounts on your first booking!</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/register">
+            <Link to="/signup">
               <button className="bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
                 Create Account
               </button>
