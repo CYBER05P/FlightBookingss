@@ -17,22 +17,26 @@ const flightPromos = [
     priceTag: "Up to 15% OFF",
     image: "/images/Mombasa1.jpg",
     destination: "Mombasa",
+    link: "/promo-mombasa", // ✅ your custom promo page
   },
   {
-    title: "Discover Mombasa's Hidden Gems",
-    subtitle: "Beaches, Culture & Adventure!",
-    priceTag: "Special Packages Available",
-    image: "/images/Mombasa2.jpg",
-    destination: "Mombasa",
+    title: "Fly to Dubai in Style",
+    subtitle: "Luxury shopping, desert tours & skyline views",
+    priceTag: "Now from KSH 25,000",
+    image: "/images/Dubai1.jpg", // ✅ make sure you add this image
+    destination: "Dubai",
+    link: "/promo-dubai",
   },
   {
-    title: "Luxury Resorts in Mombasa",
-    subtitle: "Unwind in Style",
-    priceTag: "All-Inclusive Deals",
-    image: "/images/Mombasa3.jpg",
-    destination: "Mombasa",
+    title: "Kisumu Awaits: Sunsets & Lakefront Charm",
+    subtitle: "Culture, Cuisine & Cruises",
+    priceTag: "From KSH 4,500",
+    image: "/images/Kisumu1.jpg", // ✅ add this image too
+    destination: "Kisumu",
+    link: "promo-kisumu",
   },
 ];
+
 
 const popularDestinations = [
   { name: "Nairobi", image: "/images/Nbo.jpg", price: "From KSH 5,000" },
@@ -92,11 +96,12 @@ export default function HomePage() {
               </span>
               <h2 className="text-3xl md:text-4xl font-bold mb-2">{promo.title}</h2>
               <p className="text-xl mb-6">{promo.subtitle}</p>
-              <Link to="/flights">
-                <button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
-                  Book Now - {promo.priceTag}
-                </button>
+              <Link to={promo.link}>
+                  <button className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-white font-semibold transition-all duration-300 transform hover:scale-105">
+                     Book Now - {promo.priceTag}
+                  </button>
               </Link>
+
             </div>
           </div>
         ))}
