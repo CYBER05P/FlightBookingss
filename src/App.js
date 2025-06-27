@@ -5,6 +5,9 @@ import HomePage from './pages/HomePage';
 import FlightResultPage from "./pages/FlightResultPage";
 import BookingPage from "./pages/BookingPage"; 
 import DealDetailsPage from "./pages/DealDetailsPage";
+import PromoMombasa from './pages/PromoMombasa'; // adjust path as needed
+import PromoDubaiPage from './pages/PromoDubaiPage';
+import PromoKisumuPage from './pages/PromoKisumuPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import TravelArticle from './pages/TravelArticle';
@@ -21,6 +24,9 @@ function App() {
         <Route path="/flights" element={<FlightResultPage />} />
         <Route path="/booking" element={<BookingPage />} /> {/* Booking Route */}
         <Route path="/deals/:id" element={<DealDetailsPage />} />
+        <Route path="/promo-mombasa" element={<PromoMombasa />} />
+        <Route path="/promo-dubai" element={<PromoDubaiPage />} />
+        <Route path="/promo-kisumu" element={<PromoKisumuPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/travel/:slug" element={<TravelArticle />} />
