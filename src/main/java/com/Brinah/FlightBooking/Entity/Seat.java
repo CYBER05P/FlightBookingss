@@ -2,7 +2,6 @@ package com.Brinah.FlightBooking.Entity;
 import com.Brinah.FlightBooking.Enum.SeatClass;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 @Entity
 @Getter

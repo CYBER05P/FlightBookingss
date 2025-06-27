@@ -5,7 +5,6 @@ import com.Brinah.FlightBooking.Entity.Booking;
 import com.Brinah.FlightBooking.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Arrays;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {

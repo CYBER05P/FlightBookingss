@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage';
 import FlightResultPage from "./pages/FlightResultPage";
 import BookingPage from "./pages/BookingPage"; 
 import DealDetailsPage from "./pages/DealDetailsPage";
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/flights" element={<FlightResultPage />} />
         <Route path="/booking" element={<BookingPage />} /> {/* Booking Route */}
         <Route path="/deals/:id" element={<DealDetailsPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </Router>
   );
