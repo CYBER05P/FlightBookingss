@@ -74,8 +74,8 @@ const DealDetailsPage = () => {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center px-4">
-      <div className="w-full max-w-6xl h-[90%] bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
+    <div className="min-h-screen bg-white px-4 py-8 flex justify-center">
+      <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
 
         {/* Left: Image */}
         <div className="md:w-1/2 h-64 md:h-full">
@@ -89,26 +89,19 @@ const DealDetailsPage = () => {
         {/* Right: Content */}
         <div className="md:w-1/2 flex flex-col justify-between p-4 md:p-6 overflow-y-auto">
           <div className="space-y-4 flex-grow">
-            {/* Title */}
             <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
               <FaTag className="text-blue-600" />
               {deal.title}
             </h2>
 
-            {/* Expiry badge */}
             {daysLeft !== null && (
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                  daysLeft < 5
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}
-              >
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                daysLeft < 5 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-800'
+              }`}>
                 🕒 Expires in {daysLeft} day{daysLeft !== 1 ? 's' : ''}
               </span>
             )}
 
-            {/* Promo Codes */}
             <div className="flex flex-wrap gap-2 text-sm">
               <span className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-semibold">
                 <FaTag /> {deal.code}
@@ -120,7 +113,6 @@ const DealDetailsPage = () => {
 
             <p className="text-gray-700 text-sm">{deal.description}</p>
 
-            {/* Grid Info */}
             <div className="text-sm grid grid-cols-2 gap-2">
               <div>
                 <p className="text-gray-500">Valid Until:</p>
@@ -140,7 +132,6 @@ const DealDetailsPage = () => {
               </div>
             </div>
 
-            {/* Animated Route */}
             <div className="flex items-center justify-start gap-1 text-blue-600 text-xs pt-1">
               <FaPlane className="animate-bounce" />
               <span className="font-medium">Nairobi</span>
@@ -150,7 +141,6 @@ const DealDetailsPage = () => {
               <span className="font-medium">Kisumu</span>
             </div>
 
-            {/* Map Preview */}
             <div className="rounded-lg overflow-hidden shadow border border-gray-200">
               <img
                 src="/images/kenya-map-routes.png"
@@ -159,13 +149,11 @@ const DealDetailsPage = () => {
               />
             </div>
 
-            {/* Example Booking */}
             <div className="bg-gray-100 p-2 rounded-md text-xs">
               <p className="font-semibold mb-1">Example Booking:</p>
               <p>Book on July 1st for a September 5th flight and save {deal.discount * 100}% on Mombasa route!</p>
             </div>
 
-            {/* Ideal For */}
             <div className="text-xs">
               <p className="text-gray-500">Ideal For:</p>
               <ul className="list-disc list-inside text-gray-700">
@@ -175,14 +163,12 @@ const DealDetailsPage = () => {
               </ul>
             </div>
 
-            {/* Terms */}
             <div className="bg-blue-50 p-3 rounded-md text-xs">
               <p className="font-semibold mb-1">Terms & Conditions:</p>
               <p className="text-gray-600">{deal.terms}</p>
             </div>
           </div>
 
-          {/* Button */}
           <button
             onClick={handleApply}
             className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold flex justify-center items-center gap-2 text-sm"

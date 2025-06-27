@@ -1,24 +1,29 @@
+// components/TravelTips.jsx
 import React from 'react';
+import { Link } from 'react-router-dom';
+
+const tips = [
+  {
+    title: "5 Must-Visit Beaches in Kenya",
+    excerpt: "Discover hidden gems along Kenya's coastline",
+    image: "/images/Beach.jpg",
+    slug: "beaches-in-kenya"
+  },
+  {
+    title: "Packing List for Safari Adventures",
+    excerpt: "Essential items for your wildlife experience",
+    image: "/images/Packing.jpg",
+    slug: "safari-packing-list"
+  },
+  {
+    title: "How to Navigate Kenyan Airports",
+    excerpt: "Tips for smooth airport experiences",
+    image: "/images/Airport.jpg",
+    slug: "navigating-airports"
+  }
+];
 
 const TravelTips = () => {
-  const tips = [
-    {
-      title: "5 Must-Visit Beaches in Kenya",
-      excerpt: "Discover hidden gems along Kenya's coastline",
-      image: "/images/Beach.jpg"
-    },
-    {
-      title: "Packing List for Safari Adventures",
-      excerpt: "Essential items for your wildlife experience",
-      image: "/images/Packing.jpg"
-    },
-    {
-      title: "how to Navigate Kenyan Airports",
-      excerpt: "Tips for smooth airport experiences",
-      image: "/images/Airport.jpg"
-    }
-  ];
-
   return (
     <section className="mx-6 mb-12">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Travel Tips & Guides</h2>
@@ -33,9 +38,9 @@ const TravelTips = () => {
             <div className="p-6">
               <h3 className="text-xl font-semibold mb-2">{tip.title}</h3>
               <p className="text-gray-600 mb-4">{tip.excerpt}</p>
-              <button className="text-blue-600 font-medium hover:underline">
+              <Link to={`/travel/${tip.slug}`} className="text-blue-600 font-medium hover:underline">
                 Read More →
-              </button>
+              </Link>
             </div>
           </div>
         ))}
