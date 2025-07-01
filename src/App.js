@@ -5,7 +5,6 @@ import HomePage from "./pages/HomePage";
 import FlightResultPage from "./pages/FlightResultPage";
 import BookingPage from "./pages/BookingPage";
 import DealDetailsPage from "./pages/DealDetailsPage";
-<<<<<<< HEAD
 import PromoMombasa from './pages/PromoMombasa'; // adjust path as needed
 import PromoDubaiPage from './pages/PromoDubaiPage';
 import PromoKisumuPage from './pages/PromoKisumuPage';
@@ -17,41 +16,8 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import TravelArticle from './pages/TravelArticle';
 import MyBookingsPage from './pages/MyBookingsPage';
-=======
-import PromoMombasa from "./pages/PromoMombasa";
-import PromoDubaiPage from "./pages/PromoDubaiPage";
-import PromoKisumuPage from "./pages/PromoKisumuPage";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import TravelArticle from "./pages/TravelArticle";
-import MyBookingsPage from "./pages/MyBookingsPage";
->>>>>>> 69dea6007c49dda9517094150f107f1e58bf0a28
 
-// Admin Pages
-import AdminDashboard from "./pages/AdminDashboard";
-import ManageFlights from "./pages/ManageFlights";
-import ManagePromotions from "./pages/ManagePromotions";
-import ManageBookings from "./pages/ManageBookings";
-import AdminStats from "./pages/AdminStats";
-import AdminTrends from "./pages/AdminTrends";
-import AdminNotifications from "./pages/AdminNotifications";
-import ManageUsers from "./pages/ManageUsers";
-import SystemLogs from "./pages/SystemLogs";
-import ManageAircrafts from "./pages/ManageAircrafts";
-import ManageAirports from "./pages/ManageAirports";
-
-function AdminRoute({ children }) {
-  const user = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user"));
-
-  if (user && user.role && user.role.toLowerCase() === "admin") {
-    return children;
-  } else {
-    window.location.href = "/login";
-    return null;
-  }
-}
-
-export default function App() {
+function App() {
   return (
     <Router>
       <Routes>
@@ -60,7 +26,7 @@ export default function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/flights" element={<FlightResultPage />} />
-        <Route path="/booking" element={<BookingPage />} />
+        <Route path="/booking" element={<BookingPage />} /> {/* Booking Route */}
         <Route path="/deals/:id" element={<DealDetailsPage />} />
         <Route path="/promo-mombasa" element={<PromoMombasa />} />
         <Route path="/promo-dubai" element={<PromoDubaiPage />} />
@@ -90,3 +56,5 @@ export default function App() {
     </Router>
   );
 }
+
+export default App;
