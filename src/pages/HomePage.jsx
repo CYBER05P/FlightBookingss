@@ -39,11 +39,12 @@ const flightPromos = [
 
 
 const popularDestinations = [
-  { name: "Nairobi", image: "/images/Nbo.jpg", price: "From KSH 5,000" },
-  { name: "Kisumu", image: "/images/Kisumu.jpg", price: "From KSH 4,500" },
-  { name: "Eldoret", image: "/images/Eldoret.jpg", price: "From KSH 3,800" },
-  { name: "Malindi", image: "/images/Malindi.jpg", price: "From KSH 6,200" },
+  { name: "Nairobi", image: "/images/Nbo.jpg", price: "From KSH 5,000", link: "/destinations/nairobi" },
+  { name: "Kisumu", image: "/images/Kisumu.jpg", price: "From KSH 4,500", link: "/destinations/kisumu" },
+  { name: "Eldoret", image: "/images/Eldoret.jpg", price: "From KSH 3,800", link: "/destinations/eldoret" },
+  { name: "Malindi", image: "/images/Malindi.jpg", price: "From KSH 6,200", link: "/destinations/malindi" },
 ];
+
 
 export default function HomePage() {
   const [current, setCurrent] = useState(0);
@@ -134,7 +135,8 @@ export default function HomePage() {
                 <h3 className="text-xl font-bold">{destination.name}</h3>
                 <p className="text-sm">{destination.price}</p>
               </div>
-              <Link to="/flights" className="absolute inset-0"></Link>
+              <Link to={destination.link} className="absolute inset-0"></Link>
+
             </div>
           ))}
         </div>

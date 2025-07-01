@@ -8,6 +8,10 @@ import DealDetailsPage from "./pages/DealDetailsPage";
 import PromoMombasa from './pages/PromoMombasa'; // adjust path as needed
 import PromoDubaiPage from './pages/PromoDubaiPage';
 import PromoKisumuPage from './pages/PromoKisumuPage';
+import DestinationNairobiPage from "./pages/DestinationNairobiPage";
+import DestinationKisumuPage from "./pages/DestinationKisumuPage";
+import DestinationEldoretPage from "./pages/DestinationEldoretPage";
+import DestinationMalindiPage from "./pages/DestinationMalindiPage";
 import About from './pages/About';
 import Contact from './pages/Contact';
 import TravelArticle from './pages/TravelArticle';
@@ -27,6 +31,10 @@ function App() {
         <Route path="/promo-mombasa" element={<PromoMombasa />} />
         <Route path="/promo-dubai" element={<PromoDubaiPage />} />
         <Route path="/promo-kisumu" element={<PromoKisumuPage />} />
+        <Route path="/destinations/nairobi" element={<DestinationNairobiPage />} />
+        <Route path="/destinations/kisumu" element={<DestinationKisumuPage />} />
+        <Route path="/destinations/eldoret" element={<DestinationEldoretPage />} />
+        <Route path="/destinations/malindi" element={<DestinationMalindiPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/travel/:slug" element={<TravelArticle />} />
