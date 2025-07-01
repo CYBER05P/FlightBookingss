@@ -1,29 +1,30 @@
 import axios from 'axios';
 
-// Create Axios instance with your API base URL
+// Create Axios instance
 const instance = axios.create({
-  baseURL: 'http://192.168.1.143:8085/api', // Adjust if needed
+  baseURL: 'http://192.168.1.143:8085/api', // ✅ Adjust to your backend IP/port
 });
 
-// Request Interceptor to attach Bearer token
+// ✅ Request Interceptor - attach token to all requests
 instance.interceptors.request.use(
   (config) => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user'));
     if (user?.token) {
-      config.headers.Authorization = `Bearer ${user.token}`;  // Ensure Bearer prefix
+      config.headers.Authorization = `Bearer ${user.token}`; // ✅ Use backticks
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Optional: Global error handling with Response Interceptor
+// ✅ Response Interceptor - handle 401 globally
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       alert("Session expired or unauthorized. Please log in again.");
       localStorage.removeItem('user');
+      sessionStorage.removeItem('user');
       window.location.href = '/login';
     }
     return Promise.reject(error);

@@ -1,84 +1,112 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from '../axiosConfig';
-import { motion } from 'framer-motion';
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import axios from "../axiosConfig";
+import { FaPlaneDeparture, FaEye, FaEyeSlash } from "react-icons/fa";
 
-function Login() {
+export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post('/auth/login', { email, password });
+      const res = await axios.post("/auth/login", { email, password });
 
-      // Ensure token is properly stored for interceptor
       const userData = {
-        name: response.data.name,
-        email: response.data.email,
-        token: response.data.token,  // Raw token expected here
+        name: res.data.name,
+        email: res.data.email,
+        role: res.data.role.toLowerCase(), // Normalize role here
+        token: res.data.token,
+        idOrPassport: res.data.idOrPassport,
+        country: res.data.country,
+        dateOfBirth: res.data.dateOfBirth
       };
 
-      localStorage.setItem('user', JSON.stringify(userData));
+      if (rememberMe) {
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', userData.token);
+      } else {
+        sessionStorage.setItem('user', JSON.stringify(userData));
+        sessionStorage.setItem('token', userData.token);
+      }
 
-      alert('Login successful!');
-      navigate('/HomePage');
-    } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
-      alert('Login failed. Please check your credentials.');
+      console.log("Logged in as:", userData.role);
+
+      if (userData.role === "admin") {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/homepage');
+      }
+
+    } catch (err) {
+      console.error("Login failed:", err);
+      alert("Invalid credentials, please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-blue-300">
-      <motion.div
-        className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">Login to Your Account</h2>
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block text-gray-600 mb-1">Email</label>
+    <div className="min-h-screen flex items-center justify-center bg-blue-50">
+      <div className="bg-white p-8 rounded shadow-lg max-w-md w-full">
+        <div className="flex items-center justify-center mb-6">
+          <FaPlaneDeparture className="text-blue-600 text-3xl mr-2" />
+          <h2 className="text-2xl font-bold text-gray-800">FMS Airways Login</h2>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="block w-full p-2 border rounded focus:outline-blue-500"
+            required
+          />
+
+          <div className="relative">
             <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-600 mb-1">Password</label>
-            <input
-              type="password"
-              required
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full p-2 border rounded focus:outline-blue-500"
+              required
             />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-gray-500 cursor-pointer"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
+
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>Remember Me</span>
+            </label>
+            <span
+              className="text-blue-600 hover:underline cursor-pointer"
+              onClick={() => navigate('/forgot-password')}
+            >
+              Forgot Password?
+            </span>
+          </div>
+
+          <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
             Login
-          </motion.button>
+          </button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:underline">
-            Sign Up
-          </Link>
-        </p>
-      </motion.div>
+      </div>
     </div>
   );
 }
-
-export default Login;
