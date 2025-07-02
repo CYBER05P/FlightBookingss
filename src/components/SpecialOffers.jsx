@@ -1,108 +1,141 @@
-import { Link } from "react-router-dom";
-import { FaArrowRight, FaPlane } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaClock, FaTag, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-const SpecialOffers = () => {
-  const deals = [
-    {
-      id: 1,
-      title: "Early Bird Special",
-      description: "Book 60+ days in advance and save up to 20% on select routes",
-      code: "EARLY20",
-      discount: 0.20,
-      destinations: ["Mombasa", "Nairobi", "Kisumu"],
-      validUntil: "2025-12-31",
-      image: "/images/Malindi.jpg"
-    },
-    {
-      id: 2,
-      title: "Weekend Getaway",
-      description: "Discounted flights every Friday-Sunday to popular destinations",
-      code: "WEEKEND15",
-      discount: 0.15,
-      destinations: ["Malindi", "Diani", "Lamu"],
-      validUntil: "2025-11-30",
-      image: "/images/Lamu.jpg"
-    },
-    {
-      id: 3,
-      title: "Student Discount",
-      description: "15% off for students with valid ID on all domestic flights",
-      code: "STUDENT15",
-      discount: 0.15,
-      destinations: ["All Domestic"],
-      validUntil: "2026-06-30",
-      image: "/images/Diani.jpg"
-    }
-  ];
+const offers = [
+  {
+    title: "15% OFF Flights to Mombasa",
+    description: "Limited time beach escape deal.",
+    expiresIn: 3600,
+    image: "/images/Mombasa1.jpg",
+  },
+  {
+    title: "Dubai Luxury Sale",
+    description: "Fly to Dubai with up to 20% off.",
+    expiresIn: 5400,
+    image: "/images/Dubai1.jpg",
+  },
+  {
+    title: "Kisumu Lake Adventure",
+    description: "Explore sunsets and lakefront charm.",
+    expiresIn: 2700,
+    image: "/images/Kisumu1.jpg",
+  },
+  {
+    title: "Paris Romantic Getaway",
+    description: "Love in the City of Lights with 10% off.",
+    expiresIn: 7200,
+    image: "/images/Paris.jpg",
+  },
+  {
+    title: "Nairobi Safari Special",
+    description: "Wildlife adventure, discounted fares.",
+    expiresIn: 4500,
+    image: "/images/Nairobi.jpg",
+  },
+  {
+    title: "Malindi Coastal Relaxation",
+    description: "Tropical bliss at reduced prices.",
+    expiresIn: 3600,
+    image: "/images/Malindi.jpg",
+  },
+];
+
+export default function SpecialOffers() {
+  const [timers, setTimers] = useState(offers.map((o) => o.expiresIn));
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimers((prev) => prev.map((time) => (time > 0 ? time - 1 : 0)));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const next = () => {
+    setCurrentIndex((prev) => (prev + 2) % offers.length);
+  };
+
+  const prev = () => {
+    setCurrentIndex((prev) =>
+      prev - 2 < 0 ? offers.length - (offers.length % 2 === 0 ? 2 : 1) : prev - 2
+    );
+  };
 
   return (
-    <section className="py-12 px-6 bg-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Exclusive Flight Deals</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Unlock special savings on your next trip with these limited-time offers
-          </p>
-        </div>
+    <section className="mx-6 mb-16">
+      <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">
+        ✨ Limited Time Offers ✨
+      </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {deals.map((deal) => (
-            <div key={deal.id} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="h-40 bg-gray-100 relative overflow-hidden">
-                <img src={deal.image} alt={deal.title} className="w-full h-full object-cover" />
-                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  {deal.destinations.length === 1 ? deal.destinations[0] : `${deal.destinations.length} Destinations`}
+      <div className="relative max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[0, 1].map((offset) => {
+            const index = (currentIndex + offset) % offers.length;
+            const offer = offers[index];
+
+            return (
+              <div
+                key={offset}
+                className="relative h-72 rounded-2xl overflow-hidden shadow-xl group transform hover:scale-105 transition duration-500"
+                style={{
+                  backgroundImage: `url(${offer.image})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <div className="absolute inset-0 bg-black/50 flex flex-col justify-between p-6 text-white">
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold mb-4 flex items-center">
+                      <FaTag className="inline text-yellow-400 mr-2" /> {offer.title}
+                    </h3>
+                    <p className="text-sm md:text-base opacity-90 leading-relaxed">{offer.description}</p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <FaClock />
+                      <span className="font-semibold">
+                        {timers[index] > 0 ? formatTime(timers[index]) : "Expired"}
+                      </span>
+                    </div>
+
+                    <button
+                      disabled={timers[index] <= 0}
+                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition transform hover:scale-110 ${
+                        timers[index] > 0
+                          ? "bg-blue-600 hover:bg-blue-700 text-white"
+                          : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                      }`}
+                    >
+                      {timers[index] > 0 ? "Book Now" : "Offer Ended"}
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-xl font-bold text-gray-800">{deal.title}</h3>
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">
-                    {deal.code}
-                  </span>
-                </div>
-
-                <p className="text-gray-600 mb-4">{deal.description}</p>
-
-                <div className="mb-4">
-                  <p className="text-sm text-gray-500 mb-1">
-                    <span className="font-medium">Valid until:</span> {new Date(deal.validUntil).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    <span className="font-medium">Destinations:</span> {deal.destinations.join(", ")}
-                  </p>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <Link to={`/deals/${deal.id}`} className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2 transition-colors">
-                    View details <FaArrowRight className="text-sm" />
-                  </Link>
-
-                  <Link
-                    to="/flights"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
-                    onClick={() => {
-                      localStorage.setItem('promoCode', deal.code);
-                      localStorage.setItem('promoDiscount', deal.discount);
-                    }}
-                  >
-                    <FaPlane /> Apply Deal
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="text-center mt-10">
-          <Link to="/deals" className="inline-block border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-            View All Flight Deals
-          </Link>
+        <div className="flex justify-center mt-6 space-x-4">
+          <button
+            onClick={prev}
+            className="bg-gray-200 hover:bg-gray-300 p-3 rounded-full shadow hover:scale-110 transition"
+          >
+            <FaChevronLeft />
+          </button>
+          <button
+            onClick={next}
+            className="bg-gray-200 hover:bg-gray-300 p-3 rounded-full shadow hover:scale-110 transition"
+          >
+            <FaChevronRight />
+          </button>
         </div>
       </div>
     </section>
   );
-};
-
-export default SpecialOffers;
+}

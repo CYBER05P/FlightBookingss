@@ -1,52 +1,53 @@
 // components/TravelTips.jsx
-import React from 'react';
-import { Link } from 'react-router-dom';
+
+import { FaPlane, FaPassport, FaSuitcase, FaGlobeAfrica } from "react-icons/fa";
 
 const tips = [
   {
-    title: "5 Must-Visit Beaches in Kenya",
-    excerpt: "Discover hidden gems along Kenya's coastline",
-    image: "/images/Beach.jpg",
-    slug: "beaches-in-kenya"
+    icon: <FaPlane className="text-blue-600 text-3xl" />, 
+    title: "Book Early",
+    description: "Secure the best prices by booking your flights well in advance.",
   },
   {
-    title: "Packing List for Safari Adventures",
-    excerpt: "Essential items for your wildlife experience",
-    image: "/images/Packing.jpg",
-    slug: "safari-packing-list"
+    icon: <FaPassport className="text-blue-600 text-3xl" />, 
+    title: "Check Travel Requirements",
+    description: "Always verify visa, vaccination, and document requirements before traveling.",
   },
   {
-    title: "How to Navigate Kenyan Airports",
-    excerpt: "Tips for smooth airport experiences",
-    image: "/images/Airport.jpg",
-    slug: "navigating-airports"
-  }
+    icon: <FaSuitcase className="text-blue-600 text-3xl" />, 
+    title: "Pack Smart",
+    description: "Keep essentials in your carry-on and pack according to your airline's baggage policy.",
+  },
+  {
+    icon: <FaGlobeAfrica className="text-blue-600 text-3xl" />, 
+    title: "Explore Local Culture",
+    description: "Immerse yourself in local traditions, food, and experiences for a richer trip.",
+  },
 ];
 
-const TravelTips = () => {
+export default function TravelTips() {
   return (
-    <section className="mx-6 mb-12">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Travel Tips & Guides</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {tips.map((tip, index) => (
-          <div key={index} className="bg-white rounded-xl overflow-hidden shadow-md">
-            <img 
-              src={tip.image} 
-              alt={tip.title}
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-2">{tip.title}</h3>
-              <p className="text-gray-600 mb-4">{tip.excerpt}</p>
-              <Link to={`/travel/${tip.slug}`} className="text-blue-600 font-medium hover:underline">
-                Read More →
-              </Link>
+    <section className="bg-white py-12 px-6">
+      <div className="max-w-6xl mx-auto text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-8">Top Travel Tips</h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {tips.map((tip, index) => (
+            <div
+              key={index}
+              className="border rounded-xl p-6 hover:shadow-lg transition cursor-pointer group"
+            >
+              <div className="mb-4 flex items-center justify-center">
+                {tip.icon}
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-gray-800 group-hover:text-blue-600">
+                {tip.title}
+              </h3>
+              <p className="text-gray-600 text-sm">{tip.description}</p>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
-};
-
-export default TravelTips;
+}
