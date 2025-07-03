@@ -1,12 +1,26 @@
 import { Link } from "react-router-dom";
 import { FaCheckCircle, FaUmbrellaBeach, FaPlane } from "react-icons/fa";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function PromoMombasaPage() {
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 600,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center px-4 py-20"
       style={{
-        backgroundImage: `url('/images/mombasa-promo.jpg')`, // Replace with your nice hero beach image
+        backgroundImage: `url('/images/mombasa-promo.jpg')`,
       }}
     >
       <div className="bg-white bg-opacity-90 backdrop-blur-md p-10 rounded-3xl shadow-2xl max-w-3xl w-full text-center border border-blue-200">
@@ -38,41 +52,24 @@ export default function PromoMombasaPage() {
           </li>
         </ul>
 
-        {/* Beautiful Mombasa Image */}
-        <div className="rounded-xl overflow-hidden shadow-md border border-gray-300 mb-4">
-          <img
-            src="/images/mombasa-coastline.jpg" // Your nicer scenic image here
-            alt="Mombasa Beach"
-            className="w-full h-48 object-cover rounded shadow"
-          />
+        {/* Scenic Image Carousel */}
+        <div className="mb-8 rounded-xl overflow-hidden shadow-md border border-gray-300">
+          <Slider {...sliderSettings}>
+            {[
+              "/images/mombasa11.jpg",
+              "/images/mombasa21.jpg",
+              "/images/mombasa31.jpg",
+              "/images/mombasa-coastline.jpg",
+            ].map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`Mombasa Slide ${i + 1}`}
+                className="w-full h-64 object-cover rounded-xl"
+              />
+            ))}
+          </Slider>
         </div>
-        {/* Scenic Mombasa Carousel */}
-        <div className="overflow-hidden w-full mb-8">
-        <div className="flex animate-slide gap-4 w-max">
-          <img
-      src="/images/mombasa11.jpg"
-      alt="Mombasa Beach 1"
-      className="w-80 h-48 object-cover rounded-xl shadow-md"
-    />
-          <img
-      src="/images/mombasa21.jpg"
-      alt="Mombasa Beach 2"
-      className="w-80 h-48 object-cover rounded-xl shadow-md"
-    />
-          <img
-      src="/images/mombasa31.jpg"
-      alt="Mombasa Beach 3"
-      className="w-80 h-48 object-cover rounded-xl shadow-md"
-    />
-    {/* Duplicate for seamless loop */}
-    <img
-      src="/images/mombasa1.jpg"
-      alt="Loop Back"
-      className="w-80 h-48 object-cover rounded-xl shadow-md"
-    />
-  </div>
-</div>
-
 
         {/* Google Maps Link */}
         <p className="text-center text-sm mb-6">
@@ -86,7 +83,7 @@ export default function PromoMombasaPage() {
           </a>
         </p>
 
-        {/* New: Deal Details Box */}
+        {/* Deal Details Box */}
         <div className="bg-blue-50 text-blue-900 rounded-lg p-6 mb-6 shadow-inner text-sm text-left">
           <h3 className="text-lg font-semibold mb-2">Deal Details:</h3>
           <ul className="list-disc list-inside space-y-1">

@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "../axiosConfig";
 import { FaPlaneDeparture, FaEye, FaEyeSlash } from "react-icons/fa";
+import { UserContext } from "../context/UserContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -18,7 +20,7 @@ export default function Login() {
       const userData = {
         name: res.data.name,
         email: res.data.email,
-        role: res.data.role.toLowerCase(), // Normalize role here
+        role: res.data.role.toLowerCase(),
         token: res.data.token,
         idOrPassport: res.data.idOrPassport,
         country: res.data.country,
@@ -33,7 +35,7 @@ export default function Login() {
         sessionStorage.setItem('token', userData.token);
       }
 
-      console.log("Logged in as:", userData.role);
+      setUser(userData);
 
       if (userData.role === "admin") {
         navigate('/admin/dashboard');
@@ -54,7 +56,6 @@ export default function Login() {
           <FaPlaneDeparture className="text-blue-600 text-3xl mr-2" />
           <h2 className="text-2xl font-bold text-gray-800">FMS Airways Login</h2>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
@@ -64,7 +65,6 @@ export default function Login() {
             className="block w-full p-2 border rounded focus:outline-blue-500"
             required
           />
-
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
@@ -81,7 +81,6 @@ export default function Login() {
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
-
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center space-x-2">
               <input
@@ -98,7 +97,6 @@ export default function Login() {
               Forgot Password?
             </span>
           </div>
-
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"

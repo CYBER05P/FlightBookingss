@@ -1,24 +1,22 @@
-// components/NavBar.jsx
-
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlaneDeparture } from "react-icons/fa";
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 const currencies = ["KSH", "USD", "EUR", "GBP"];
 
 export default function NavBar({ selectedCurrency, setSelectedCurrency }) {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useContext(UserContext);
   const [dropdown, setDropdown] = useState(false);
   const [currencyDropdown, setCurrencyDropdown] = useState(false);
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) setUser(storedUser);
-  }, []);
-
   const handleLogout = () => {
     localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    setUser(null);
     navigate("/login");
   };
 
@@ -30,18 +28,10 @@ export default function NavBar({ selectedCurrency, setSelectedCurrency }) {
       </div>
 
       <nav className="hidden md:flex items-center space-x-6 relative">
-        <Link to="/" className="hover:text-blue-600 font-medium">
-          Home
-        </Link>
-        <Link to="/flights" className="hover:text-blue-600 font-medium">
-          Search Flights
-        </Link>
-        <Link to="/about" className="hover:text-blue-600 font-medium">
-          About
-        </Link>
-        <Link to="/contact" className="hover:text-blue-600 font-medium">
-          Contact
-        </Link>
+        <Link to="/" className="hover:text-blue-600 font-medium">Home</Link>
+        <Link to="/flights" className="hover:text-blue-600 font-medium">Search Flights</Link>
+        <Link to="/about" className="hover:text-blue-600 font-medium">About</Link>
+        <Link to="/contact" className="hover:text-blue-600 font-medium">Contact</Link>
 
         <div className="relative">
           <button
@@ -86,19 +76,34 @@ export default function NavBar({ selectedCurrency, setSelectedCurrency }) {
             {dropdown && (
               <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-50">
                 {user.role === "admin" && (
-                  <Link
-                    to="/admin/dashboard"
-                    className="block px-4 py-2 hover:bg-gray-100"
+                  <button
+                    onClick={() => {
+                      navigate("/admin/dashboard");
+                      setDropdown(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
                     Admin Dashboard
-                  </Link>
+                  </button>
                 )}
-                <Link to="/bookings" className="block px-4 py-2 hover:bg-gray-100">
+                <button
+                  onClick={() => {
+                    navigate("/bookings");
+                    setDropdown(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
                   My Bookings
-                </Link>
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setDropdown(false);
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
                   Profile
-                </Link>
+                </button>
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100"

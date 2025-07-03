@@ -1,12 +1,27 @@
 import { Link } from "react-router-dom";
 import { FaCheckCircle, FaCity, FaPlane } from "react-icons/fa";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 
 export default function PromoDubaiPage() {
+  const sliderSettings = {
+  dots: true,
+  infinite: true,
+  speed: 600,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  autoplay: true,
+  autoplaySpeed: 3000,
+  arrows: true,
+};
+
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center px-4 py-20"
       style={{
-        backgroundImage: `url('/images/dubai-promo.jpg')`,
+        backgroundImage: `url('/images/dubai-promo2.jpg')`,
       }}
     >
       <div className="bg-white bg-opacity-95 backdrop-blur-lg p-10 rounded-3xl shadow-2xl max-w-3xl w-full text-center border border-yellow-300">
@@ -35,13 +50,24 @@ export default function PromoDubaiPage() {
           </li>
         </ul>
 
-        <div className="rounded-xl overflow-hidden shadow-md border border-gray-300 mb-6">
-          <img
-            src="/images/dubai-promo1.jpg"
-            alt="Dubai View"
-            className="w-full h-48 object-cover rounded shadow"
-          />
-        </div>
+        {/* Scenic Slider for Dubai */}
+       <div className="mb-8 rounded-xl overflow-hidden shadow-md border border-gray-300">
+       <Slider {...sliderSettings}>
+       {[
+         "/images/dubai-promo1.jpg",
+         "/images/dubai2.jpg",
+         "/images/dubai3.jpg",
+         "/images/dubai4.jpg",
+        ].map((src, i) => (
+      <img
+        key={i}
+        src={src}
+        alt={`Dubai Slide ${i + 1}`}
+        className="w-full h-64 object-cover rounded-xl"
+      />
+    ))}
+  </Slider>
+</div>
 
         <a
           href="https://www.google.com/maps/place/Dubai,+United+Arab+Emirates"
