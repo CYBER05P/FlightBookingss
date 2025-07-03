@@ -17,6 +17,20 @@ import Contact from './pages/Contact';
 import TravelArticle from './pages/TravelArticle';
 import MyBookingsPage from './pages/MyBookingsPage';
 
+// ...existing code...
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './pages/AdminDashboard';
+import ManageFlights from './pages/ManageFlights';
+import ManageAircrafts from './pages/ManageAircrafts';
+import ManageAirports from './pages/ManageAirports';
+import ManagePromotions from './pages/ManagePromotions';
+import ManageBookings from './pages/ManageBookings';
+import AdminStats from './pages/AdminStats';
+import AdminTrends from './pages/AdminTrends';
+import AdminNotifications from './pages/AdminNotifications';
+import ManageUsers from './pages/ManageUsers';
+import SystemLogs from './pages/SystemLogs';
+
 function App() {
   return (
     <Router>
