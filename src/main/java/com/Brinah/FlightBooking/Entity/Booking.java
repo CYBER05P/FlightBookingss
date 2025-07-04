@@ -36,3 +36,4 @@ public class Booking {
     private Double totalPrice;
 
 }
+

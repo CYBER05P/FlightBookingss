@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface FlightRepository extends JpaRepository<Flight, Long> {
+
     @Query("SELECT f FROM Flight f " +
             "JOIN f.departureAirport da " +
             "JOIN f.arrivalAirport aa " +
@@ -25,4 +26,7 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             @Param("date") LocalDate date,
             @Param("status") FlightStatus status
     );
+
+    // ✅ New Methods for Statistics
+    long countByStatus(FlightStatus status); // e.g., ACTIVE, COMPLETED
 }

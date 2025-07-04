@@ -4,4 +4,6 @@ public enum FlightStatus {
     ACTIVE,
     CANCELLED,
     DELAYED,
+    COMPLETED // ✅ Add this line
 }
+

@@ -4,6 +4,7 @@ import com.Brinah.FlightBooking.Enum.Role;
 import lombok.Data;
 
 import java.time.LocalDate;
+
 @Data
 public class UserDto {
     private Long id;
@@ -14,7 +15,7 @@ public class UserDto {
     private String country;
     private Role role;
     private boolean enabled;
-    // Inside UserDto.java
+
     public String getIdOrEmail() {
         if (this.id != null) {
             return String.valueOf(this.id);
@@ -22,5 +23,6 @@ public class UserDto {
             return this.email;
         }
     }
-
 }
+
+

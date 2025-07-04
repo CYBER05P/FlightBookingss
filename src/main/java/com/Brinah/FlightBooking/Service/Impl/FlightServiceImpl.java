@@ -4,6 +4,7 @@ import com.Brinah.FlightBooking.DTO.FlightCreationDto;
 import com.Brinah.FlightBooking.DTO.FlightDto;
 import com.Brinah.FlightBooking.DTO.FlightResponse;
 import com.Brinah.FlightBooking.DTO.FlightSearchRequest;
+import com.Brinah.FlightBooking.DTO.FlightStatisticsDto;
 import com.Brinah.FlightBooking.Entity.*;
 import com.Brinah.FlightBooking.Enum.FlightStatus;
 import com.Brinah.FlightBooking.Exception.ResourceNotFoundException;
@@ -105,6 +106,14 @@ public class FlightServiceImpl implements FlightService {
             throw new ResourceNotFoundException("Flight", "ID", id);
         }
         flightRepository.deleteById(id);
+    }
+
+    @Override
+    public FlightStatisticsDto getFlightStatistics() {
+        long total = flightRepository.count();
+        long active = flightRepository.countByStatus(FlightStatus.ACTIVE);
+        long completed = flightRepository.countByStatus(FlightStatus.COMPLETED); // optional if you support this status
+        return new FlightStatisticsDto(total, active, completed);
     }
 
     // ✨ Helper to convert Flight to DTO
