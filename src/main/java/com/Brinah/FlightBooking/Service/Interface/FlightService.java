@@ -1,30 +1,29 @@
 package com.Brinah.FlightBooking.Service.Interface;
 
-import com.Brinah.FlightBooking.DTO.FlightDto;
-import com.Brinah.FlightBooking.DTO.FlightCreationDto;
-import com.Brinah.FlightBooking.DTO.FlightResponse;
-import com.Brinah.FlightBooking.DTO.FlightSearchRequest;
+import com.Brinah.FlightBooking.DTO.*;
 
 import java.util.List;
 
 public interface FlightService {
 
-    // ✅ Use FlightCreationDto for clean creation from frontend
+    // Create a new flight
     FlightDto createFlight(FlightCreationDto flightDto);
 
-
-    // ✅ Retrieve full flight details
+    // Get flight by ID
     FlightDto getFlightById(Long id);
 
-    // ✅ List all flights (e.g., for admin view)
+    // Get all flights
     List<FlightDto> getAllFlights();
 
-    // ✅ Search flights for customer-friendly results
+    // Search for flights
     List<FlightResponse> searchFlights(FlightSearchRequest request);
 
-    // ✅ Delete a flight by ID
+    // Delete a flight by ID
     void deleteFlight(Long id);
 
+    // Delete all flights (e.g., system reset)
     void deleteAllFlights();
 
+    // Get full seat statistics per flight
+    List<FlightStatsDto> getFlightStatistics();
 }

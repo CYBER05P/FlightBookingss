@@ -1,10 +1,8 @@
 package com.Brinah.FlightBooking.Controller;
 
-import com.Brinah.FlightBooking.DTO.AircraftDto;
-import com.Brinah.FlightBooking.DTO.AirportDto;
-import com.Brinah.FlightBooking.DTO.NotificationRequest;
-import com.Brinah.FlightBooking.DTO.UserDto;
+import com.Brinah.FlightBooking.DTO.*;
 import com.Brinah.FlightBooking.Service.Interface.AdminService;
+import com.Brinah.FlightBooking.Service.Interface.FlightService;
 import com.Brinah.FlightBooking.Service.Interface.UserService;
 import com.Brinah.FlightBooking.Service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +20,7 @@ public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
     private final NotificationService notificationService;
+    private final FlightService flightService;
 
     // ===== Aircraft Endpoints =====
 
@@ -92,4 +91,10 @@ public class AdminController {
         userService.deleteUser(id);
         return ResponseEntity.ok("✅ User deleted successfully.");
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/flight-stats")
+    public ResponseEntity<List<FlightStatsDto>> getFlightStats() {
+        return ResponseEntity.ok(flightService.getFlightStatistics());
+    }
+
 }

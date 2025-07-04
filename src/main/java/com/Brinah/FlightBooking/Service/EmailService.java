@@ -1,6 +1,8 @@
 package com.Brinah.FlightBooking.Service;
 
 import com.Brinah.FlightBooking.DTO.BookingDto;
+import com.Brinah.FlightBooking.Entity.Complaint;
+import com.Brinah.FlightBooking.Entity.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +11,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.Collections;
 
 @Service
@@ -25,7 +26,6 @@ public class EmailService {
         helper.setTo(toEmail);
         helper.setSubject("✈️ Your Flight Booking Confirmation - " + bookingDto.getConfirmationCode());
 
-        // ✅ Safe QR fallback
         String base64Qr = bookingDto.getQrCodeBase64();
         if (base64Qr == null || base64Qr.trim().isEmpty()) {
             base64Qr = generatePlaceholderQr();
@@ -54,17 +54,11 @@ public class EmailService {
                 + "<p>Please present this QR code at check-in. Safe travels! 🛫</p>"
                 + "</div>";
 
-        // Set both plain text and HTML content
         helper.setText("Flight Booking Confirmation - " + bookingDto.getConfirmationCode(), html);
 
         mailSender.send(message);
     }
 
-    private String generatePlaceholderQr() {
-        // A 1x1 white pixel as a placeholder QR code
-        return "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAEklEQVR42mP8z/C/HwAF/gL+IAho3AAAAABJRU5ErkJggg==";
-    }
-    // EmailService.java
     public void sendGenericEmail(String to, String subject, String body) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -76,4 +70,33 @@ public class EmailService {
         mailSender.send(message);
     }
 
+    public void sendComplaintResponseEmail(Complaint complaint) {
+        User user = complaint.getUser();
+        String to = user.getEmail();
+        String subject = "✉️ Response to Your Complaint (ID: " + complaint.getId() + ")";
+
+        String body = "<div style='font-family:Arial,sans-serif;font-size:14px;color:#333;'>"
+                + "<h3 style='color:#c2410c;'>Your Complaint Has Been Reviewed</h3>"
+                + "<p>Dear " + user.getName() + ",</p>"
+                + "<p>Thank you for contacting us. Here is the response from our team:</p>"
+                + "<table style='border-collapse:collapse;'>"
+                + "<tr><td><strong>Complaint:</strong></td><td>" + complaint.getDescription() + "</td></tr>"
+                + "<tr><td><strong>Status:</strong></td><td>" + complaint.getStatus() + "</td></tr>"
+                + "<tr><td><strong>Response:</strong></td><td>" + complaint.getAdminResponse() + "</td></tr>"
+                + "</table>"
+                + "<p>If you have further concerns, feel free to reply or submit a new complaint.</p>"
+                + "<p style='margin-top:20px;'>Sincerely,<br/>Brinah Airlines Support Team</p>"
+                + "</div>";
+
+        try {
+            // ✅ Corrected call — now uses method within this class
+            sendGenericEmail(to, subject, body);
+        } catch (MessagingException e) {
+            System.err.println("❌ Failed to send complaint response email: " + e.getMessage());
+        }
+    }
+
+    private String generatePlaceholderQr() {
+        return "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAEklEQVR42mP8z/C/HwAF/gL+IAho3AAAAABJRU5ErkJggg==";
+    }
 }

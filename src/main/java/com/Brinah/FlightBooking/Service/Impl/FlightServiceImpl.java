@@ -3,6 +3,7 @@ package com.Brinah.FlightBooking.Service.Impl;
 import com.Brinah.FlightBooking.DTO.*;
 import com.Brinah.FlightBooking.Entity.*;
 import com.Brinah.FlightBooking.Enum.FlightStatus;
+import com.Brinah.FlightBooking.Enum.SeatClass;
 import com.Brinah.FlightBooking.Exception.ResourceNotFoundException;
 import com.Brinah.FlightBooking.Repositories.*;
 import com.Brinah.FlightBooking.Service.Interface.FlightService;
@@ -23,43 +24,52 @@ public class FlightServiceImpl implements FlightService {
     private final AirportRepository airportRepository;
     private final AircraftRepository aircraftRepository;
     private final SeatRepository seatRepository;
-    private final BookingRepository bookingRepository; // ✅ Injected here
+    private final BookingRepository bookingRepository;
     private final SeatGenerator seatGenerator;
     private final ModelMapperUtil modelMapper;
 
     @Override
     public FlightDto createFlight(FlightCreationDto flightDto) {
+        // Save or reuse aircraft
         Aircraft aircraft = aircraftRepository.findByModel(flightDto.getAircraftModel())
                 .orElseGet(() -> {
                     Aircraft newAircraft = new Aircraft();
                     newAircraft.setModel(flightDto.getAircraftModel());
+                    newAircraft.setEconomySeats(flightDto.getEconomySeats());
+                    newAircraft.setBusinessSeats(flightDto.getBusinessSeats());
+                    newAircraft.setFirstClassSeats(flightDto.getFirstClassSeats());
                     return aircraftRepository.save(newAircraft);
                 });
 
+        // Save or reuse departure airport
         Airport departureAirport = airportRepository.findByNameAndCityAndCountry(
                 flightDto.getDepartureAirportName(),
                 flightDto.getDepartureCity(),
                 flightDto.getDepartureCountry()
         ).orElseGet(() -> {
-            Airport newAirport = new Airport();
-            newAirport.setName(flightDto.getDepartureAirportName());
-            newAirport.setCity(flightDto.getDepartureCity());
-            newAirport.setCountry(flightDto.getDepartureCountry());
-            return airportRepository.save(newAirport);
+            Airport airport = new Airport();
+            airport.setName(flightDto.getDepartureAirportName());
+            airport.setCity(flightDto.getDepartureCity());
+            airport.setCountry(flightDto.getDepartureCountry());
+            airport.setCode(generateCode(flightDto.getDepartureAirportName()));
+            return airportRepository.save(airport);
         });
 
+        // Save or reuse arrival airport
         Airport arrivalAirport = airportRepository.findByNameAndCityAndCountry(
                 flightDto.getArrivalAirportName(),
                 flightDto.getArrivalCity(),
                 flightDto.getArrivalCountry()
         ).orElseGet(() -> {
-            Airport newAirport = new Airport();
-            newAirport.setName(flightDto.getArrivalAirportName());
-            newAirport.setCity(flightDto.getArrivalCity());
-            newAirport.setCountry(flightDto.getArrivalCountry());
-            return airportRepository.save(newAirport);
+            Airport airport = new Airport();
+            airport.setName(flightDto.getArrivalAirportName());
+            airport.setCity(flightDto.getArrivalCity());
+            airport.setCountry(flightDto.getArrivalCountry());
+            airport.setCode(generateCode(flightDto.getArrivalAirportName()));
+            return airportRepository.save(airport);
         });
 
+        // Create and save flight
         Flight flight = Flight.builder()
                 .flightNumber(flightDto.getFlightNumber())
                 .departureTime(flightDto.getDepartureTime())
@@ -75,7 +85,7 @@ public class FlightServiceImpl implements FlightService {
 
         Flight savedFlight = flightRepository.save(flight);
 
-        // Generate seats
+        // Generate and save seats
         List<Seat> seats = seatGenerator.generateSeatsForFlight(savedFlight);
         seatRepository.saveAll(seats);
 
@@ -105,7 +115,6 @@ public class FlightServiceImpl implements FlightService {
                 request.getDate(),
                 FlightStatus.ACTIVE
         );
-
         return flights.stream()
                 .map(modelMapper::toFlightResponse)
                 .collect(Collectors.toList());
@@ -122,10 +131,38 @@ public class FlightServiceImpl implements FlightService {
     @Transactional
     @Override
     public void deleteAllFlights() {
-        bookingRepository.deleteAllBookings();  // ✅ Step 1: delete all bookings
-        flightRepository.deleteAll();           // ✅ Step 2: delete all flights
+        bookingRepository.deleteAllBookings();
+        flightRepository.deleteAll();
     }
 
+    @Override
+    public List<FlightStatsDto> getFlightStatistics() {
+        return flightRepository.findAll().stream().map(flight -> {
+            List<Seat> seats = flight.getSeats();
+            int total = seats.size();
+            int booked = (int) seats.stream().filter(seat -> !seat.getAvailable()).count();
+            int available = total - booked;
+
+            int econTotal = (int) seats.stream().filter(s -> s.getSeatClass() == SeatClass.ECONOMY).count();
+            int econBooked = (int) seats.stream().filter(s -> s.getSeatClass() == SeatClass.ECONOMY && !s.getAvailable()).count();
+
+            int busTotal = (int) seats.stream().filter(s -> s.getSeatClass() == SeatClass.BUSINESS).count();
+            int busBooked = (int) seats.stream().filter(s -> s.getSeatClass() == SeatClass.BUSINESS && !s.getAvailable()).count();
+
+            int firstTotal = (int) seats.stream().filter(s -> s.getSeatClass() == SeatClass.FIRST).count();
+            int firstBooked = (int) seats.stream().filter(s -> s.getSeatClass() == SeatClass.FIRST && !s.getAvailable()).count();
+
+            return new FlightStatsDto(
+                    flight.getFlightNumber(),
+                    total, booked, available,
+                    econTotal, econBooked, econTotal - econBooked,
+                    busTotal, busBooked, busTotal - busBooked,
+                    firstTotal, firstBooked, firstTotal - firstBooked
+            );
+        }).collect(Collectors.toList());
+    }
+
+    // Map Flight entity to DTO
     private FlightDto convertToDto(Flight flight) {
         FlightDto dto = new FlightDto();
         dto.setId(flight.getId());
@@ -143,5 +180,10 @@ public class FlightServiceImpl implements FlightService {
         dto.setFirstClassPrice(flight.getFirstClassPrice());
         dto.setFlightStatus(flight.getStatus() != null ? flight.getStatus().name() : "UNKNOWN");
         return dto;
+    }
+
+    // Generate airport code from name (first 3 letters uppercase)
+    private String generateCode(String name) {
+        return name.length() < 3 ? name.toUpperCase() : name.substring(0, 3).toUpperCase();
     }
 }

@@ -24,29 +24,26 @@ public class ModelMapperUtil {
 
     private final ModelMapper modelMapper = new ModelMapper();
 
-    // === User ===
+    // === User Mapping ===
     public UserDto toUserDto(User user) {
         return modelMapper.map(user, UserDto.class);
     }
 
-    public User toUserEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
+    public User toUserEntity(UserDto dto) {
+        return modelMapper.map(dto, User.class);
     }
+
     public List<UserDto> toUserDtoList(List<User> users) {
-        return users.stream()
-                .map(this::toUserDto)
-                .collect(Collectors.toList());
+        return users.stream().map(this::toUserDto).collect(Collectors.toList());
     }
 
-
-    // === Booking ===
+    // === Booking Mapping ===
     public BookingDto toBookingDto(Booking booking) {
         BookingDto dto = new BookingDto();
         dto.setId(booking.getId());
         dto.setConfirmationCode(booking.getConfirmationCode());
         dto.setBookingTime(booking.getBookingTime());
 
-        // User Info
         User user = booking.getUser();
         if (user != null) {
             dto.setName(user.getName());
@@ -56,7 +53,6 @@ public class ModelMapperUtil {
             dto.setDateOfBirth(user.getDateOfBirth());
         }
 
-        // Flight Info
         Flight flight = booking.getFlight();
         if (flight != null) {
             dto.setFlightNumber(flight.getFlightNumber());
@@ -64,21 +60,14 @@ public class ModelMapperUtil {
             dto.setArrivalTime(flight.getArrivalTime());
         }
 
-        // Seats
         List<Seat> seats = booking.getSeats();
         if (seats != null) {
-            dto.setSeatNumbers(seats.stream()
-                    .map(Seat::getSeatNumber)
-                    .collect(Collectors.toList()));
-
-            dto.setSeatClasses(seats.stream()
-                    .map(seat -> seat.getSeatClass().name())
-                    .collect(Collectors.toList()));
+            dto.setSeatNumbers(seats.stream().map(Seat::getSeatNumber).collect(Collectors.toList()));
+            dto.setSeatClasses(seats.stream().map(seat -> seat.getSeatClass().name()).collect(Collectors.toList()));
         }
 
         dto.setTotalPrice(Optional.ofNullable(booking.getTotalPrice()).orElse(0.0));
 
-        // QR Code generation
         String qrText = "Booking Code: " + dto.getConfirmationCode()
                 + "\nName: " + dto.getName()
                 + "\nID/Passport: " + dto.getIdOrPassport()
@@ -87,7 +76,6 @@ public class ModelMapperUtil {
                 + "\nTotal: $" + dto.getTotalPrice();
 
         dto.setQrCodeBase64(generateQrCodeImage(qrText));
-
         return dto;
     }
 
@@ -95,50 +83,51 @@ public class ModelMapperUtil {
         return modelMapper.map(dto, Booking.class);
     }
 
-    // === Flight ===
+    // === Flight Mapping ===
     public FlightDto toFlightDto(Flight flight) {
-        FlightDto flightDto = modelMapper.map(flight, FlightDto.class);
+        FlightDto dto = modelMapper.map(flight, FlightDto.class);
         if (flight.getAircraft() != null) {
-            flightDto.setAircraftId(flight.getAircraft().getId());
+            dto.setAircraftId(flight.getAircraft().getId());
         }
-        return flightDto;
+        return dto;
     }
 
     public Flight toFlightEntity(FlightDto dto) {
         return modelMapper.map(dto, Flight.class);
     }
 
-    // === Friendly Flight View ===
     public FlightResponse toFlightResponse(Flight flight) {
         FlightResponse response = new FlightResponse();
-
         response.setFlightId(flight.getId());
         response.setFlightNumber(flight.getFlightNumber());
 
-        response.setDepartureAirportCode(flight.getDepartureAirport().getCode());
-        response.setDepartureAirportName(flight.getDepartureAirport().getName());
-        response.setDepartureCity(flight.getDepartureAirport().getCity());
-        response.setDepartureCountry(flight.getDepartureAirport().getCountry());
+        if (flight.getDepartureAirport() != null) {
+            response.setDepartureAirportCode(flight.getDepartureAirport().getCode());
+            response.setDepartureAirportName(flight.getDepartureAirport().getName());
+            response.setDepartureCity(flight.getDepartureAirport().getCity());
+            response.setDepartureCountry(flight.getDepartureAirport().getCountry());
+        }
+
+        if (flight.getArrivalAirport() != null) {
+            response.setArrivalAirportCode(flight.getArrivalAirport().getCode());
+            response.setArrivalAirportName(flight.getArrivalAirport().getName());
+            response.setArrivalCity(flight.getArrivalAirport().getCity());
+            response.setArrivalCountry(flight.getArrivalAirport().getCountry());
+        }
+
         response.setDepartureTime(flight.getDepartureTime());
-
-        response.setArrivalAirportCode(flight.getArrivalAirport().getCode());
-        response.setArrivalAirportName(flight.getArrivalAirport().getName());
-        response.setArrivalCity(flight.getArrivalAirport().getCity());
-        response.setArrivalCountry(flight.getArrivalAirport().getCountry());
         response.setArrivalTime(flight.getArrivalTime());
-
         response.setAircraftModel(flight.getAircraft().getModel());
 
         response.setEconomyPrice(flight.getEconomyPrice());
         response.setBusinessPrice(flight.getBusinessPrice());
         response.setFirstClassPrice(flight.getFirstClassPrice());
-
         response.setFlightStatus(flight.getStatus().name());
 
         return response;
     }
 
-    // === Seat ===
+    // === Seat Mapping ===
     public SeatDto toSeatDto(Seat seat) {
         return modelMapper.map(seat, SeatDto.class);
     }
@@ -147,7 +136,7 @@ public class ModelMapperUtil {
         return modelMapper.map(dto, Seat.class);
     }
 
-    // === Aircraft ===
+    // === Aircraft Mapping ===
     public AircraftDto toAircraftDto(Aircraft aircraft) {
         return modelMapper.map(aircraft, AircraftDto.class);
     }
@@ -156,13 +145,45 @@ public class ModelMapperUtil {
         return modelMapper.map(dto, Aircraft.class);
     }
 
-    // === Airport ===
+    // === Airport Mapping ===
     public AirportDto toAirportDto(Airport airport) {
         return modelMapper.map(airport, AirportDto.class);
     }
 
     public Airport toAirportEntity(AirportDto dto) {
         return modelMapper.map(dto, Airport.class);
+    }
+
+    // === Review Mapping ===
+    public ReviewDto mapReviewToDto(Review review) {
+        ReviewDto dto = new ReviewDto();
+        dto.setId(review.getId());
+        dto.setRating(review.getRating());
+        dto.setComment(review.getComment());
+        dto.setCreatedAt(review.getCreatedAt());
+        dto.setUserId(review.getUser().getId());
+        dto.setFlightId(review.getFlight().getId());
+        return dto;
+    }
+
+    public List<ReviewDto> mapReviewListToDtoList(List<Review> reviews) {
+        return reviews.stream().map(this::mapReviewToDto).collect(Collectors.toList());
+    }
+
+    // === Complaint Mapping ===
+    public ComplaintDto mapComplaintToDto(Complaint complaint) {
+        ComplaintDto dto = new ComplaintDto();
+        dto.setId(complaint.getId());
+        dto.setDescription(complaint.getDescription());
+        dto.setStatus(complaint.getStatus());
+        dto.setAdminResponse(complaint.getAdminResponse());
+        dto.setCreatedAt(complaint.getCreatedAt());
+        dto.setUserId(complaint.getUser().getId());
+        return dto;
+    }
+
+    public List<ComplaintDto> mapComplaintListToDtoList(List<Complaint> complaints) {
+        return complaints.stream().map(this::mapComplaintToDto).collect(Collectors.toList());
     }
 
     // === QR Code Generator ===

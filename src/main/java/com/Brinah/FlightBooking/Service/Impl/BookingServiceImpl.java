@@ -2,6 +2,7 @@ package com.Brinah.FlightBooking.Service.Impl;
 
 import com.Brinah.FlightBooking.DTO.BookingDto;
 import com.Brinah.FlightBooking.DTO.BookingRequest;
+import com.Brinah.FlightBooking.DTO.BookingStatsDto;
 import com.Brinah.FlightBooking.Entity.Booking;
 import com.Brinah.FlightBooking.Entity.Flight;
 import com.Brinah.FlightBooking.Entity.Seat;
@@ -139,6 +140,11 @@ public class BookingServiceImpl implements BookingService {
                 .map(modelMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<BookingStatsDto> getBookingStats() {
+        return bookingRepository.getBookingStatsPerAircraft();
+    }
+
 
     @Override
     public List<BookingDto> getAllBookings() {

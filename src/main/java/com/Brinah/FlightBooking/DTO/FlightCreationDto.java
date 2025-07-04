@@ -26,5 +26,10 @@ public class FlightCreationDto {
     private double businessPrice;
     private double firstClassPrice;
 
+    // ✅ Add these fields for seat configuration
+    private int economySeats;
+    private int businessSeats;
+    private int firstClassSeats;
+
     private FlightStatus flightStatus;  // ✅ Added manually settable status
 }
