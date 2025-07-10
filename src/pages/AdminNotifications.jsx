@@ -10,7 +10,7 @@ export default function AdminNotifications() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get("/api/admin/notifications");
+      const res = await axios.post("/api/notifications/send");
       setNotifications(res.data);
     } catch (err) {
       console.error(err);

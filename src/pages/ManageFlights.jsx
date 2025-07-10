@@ -29,7 +29,7 @@ export default function ManageFlights() {
 
   const fetchFlights = async () => {
     try {
-      const res = await axios.get("/flights");
+      const res = await axios.get("/api/flights");
       setFlights(res.data);
     } catch (err) {
       console.error(err);
