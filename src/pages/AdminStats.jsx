@@ -15,7 +15,7 @@ export default function AdminStats() {
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get("/api/admin/stats");
+      const res = await axios.get("/admin/dashboard/statistics");
       setStats(res.data);
     } catch (err) {
       console.error(err);
