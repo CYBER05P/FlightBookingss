@@ -29,6 +29,9 @@ import AdminNotifications from "./pages/AdminNotifications";
 import ManageUsers from "./pages/ManageUsers";
 import SystemLogs from "./pages/SystemLogs";
 import UserProvider from "./context/UserContext";
+import OfferDetailPage from "./pages/OfferDetailsPage"; 
+import SpecialOffers from "./components/SpecialOffers"; 
+import NotificationsPage from "./pages/NotificationsPage";
 
 export default function App() {
   return (
@@ -53,8 +56,13 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/travel/:slug" element={<TravelArticle />} />
           <Route path="/bookings" element={<MyBookingsPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
 
-          {/* Admin Protected Routes */}
+          {/* ✅ These are the key fixes: */}
+          <Route path="/deals" element={<SpecialOffers />} />
+          <Route path="/offers/:dealId" element={<OfferDetailPage />} />
+
+          {/* ✅ Admin Protected Routes */}
           <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/flights" element={<AdminRoute><ManageFlights /></AdminRoute>} />
           <Route path="/admin/aircrafts" element={<AdminRoute><ManageAircrafts /></AdminRoute>} />

@@ -38,10 +38,46 @@ const flightPromos = [
 ];
 
 const popularDestinations = [
-  { name: "Nairobi", image: "/images/Nbo.jpg", price: "From KSH 5,000", link: "/destinations/nairobi" },
-  { name: "Kisumu", image: "/images/Kisumu.jpg", price: "From KSH 4,500", link: "/destinations/kisumu" },
-  { name: "Eldoret", image: "/images/Eldoret.jpg", price: "From KSH 3,800", link: "/destinations/eldoret" },
-  { name: "Malindi", image: "/images/Malindi.jpg", price: "From KSH 6,200", link: "/destinations/malindi" },
+  {
+    name: "Nairobi",
+    image: "/images/Nbo.jpg",
+    price: "From KSH 5,000",
+    weather: "Sunny",
+    temperature: "23°C",
+    attractions: ["Giraffe Centre", "Nairobi National Park"],
+    tagline: "Bustling city life",
+    link: "/destinations/nairobi",
+  },
+  {
+    name: "Kisumu",
+    image: "/images/Kisumu.jpg",
+    price: "From KSH 4,500",
+    weather: "Partly Cloudy",
+    temperature: "27°C",
+    attractions: ["Lake Victoria", "Impala Sanctuary"],
+    tagline: "Sunset vibes & lake breeze",
+    link: "/destinations/kisumu",
+  },
+  {
+    name: "Eldoret",
+    image: "/images/Eldoret.jpg",
+    price: "From KSH 3,800",
+    weather: "Rainy",
+    temperature: "19°C",
+    attractions: ["Kapsabet Hills", "Chepkiit Falls"],
+    tagline: "Cool highland retreat",
+    link: "/destinations/eldoret",
+  },
+  {
+    name: "Malindi",
+    image: "/images/Malindi.jpg",
+    price: "From KSH 6,200",
+    weather: "Sunny",
+    temperature: "29°C",
+    attractions: ["Marine National Park", "Vasco da Gama Pillar"],
+    tagline: "Beach paradise",
+    link: "/destinations/malindi",
+  },
 ];
 
 export default function HomePage() {
@@ -58,7 +94,7 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <NavBar />
 
-      {/* Hero Section with Flight Search */}
+      {/* Hero Section */}
       <section className="relative flex flex-col items-center justify-center text-center bg-gradient-to-r from-blue-500 to-cyan-500 p-8 pt-16">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
@@ -101,8 +137,6 @@ export default function HomePage() {
             </div>
           </div>
         ))}
-
-        {/* Carousel Navigation Dots */}
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
           {flightPromos.map((_, index) => (
             <button
@@ -117,64 +151,80 @@ export default function HomePage() {
       </section>
 
       {/* Popular Kenyan Destinations */}
-      <section className="mx-6 mb-12">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Popular Kenyan Destinations</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {popularDestinations.map((destination, index) => (
-            <div key={index} className="relative rounded-xl overflow-hidden shadow-lg group">
-              <img
-                src={destination.image}
-                alt={destination.name}
-                className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 p-4 text-white">
-                <h3 className="text-xl font-bold">{destination.name}</h3>
-                <p className="text-sm">{destination.price}</p>
-              </div>
-              <Link to={destination.link} className="absolute inset-0"></Link>
-            </div>
-          ))}
+<section className="mx-6 mb-16">
+  <h2 className="text-2xl font-bold text-gray-800 mb-8">Popular Kenyan Destinations</h2>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {popularDestinations.map((destination, index) => (
+      <div
+        key={index}
+        className="bg-white rounded-xl shadow-md overflow-hidden group hover:shadow-lg transition-shadow relative"
+      >
+        <img
+          src={destination.image}
+          alt={destination.name}
+          className="h-40 w-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="p-4 space-y-2">
+          <h3 className="text-xl font-bold text-gray-900">{destination.name}</h3>
+          <p className="text-blue-600 font-semibold">{destination.price}</p>
+          <div className="flex items-center text-sm text-gray-600">
+            <span className="mr-2">🌤️ {destination.weather}</span>
+            <span>• {destination.temperature}</span>
+          </div>
+          <p className="italic text-sm text-gray-500">{destination.tagline}</p>
+          <p className="text-sm text-gray-700">
+            <strong>Top spots:</strong> {destination.attractions.join(", ")}
+          </p>
+          <Link
+            to={destination.link}
+            className="inline-block mt-3 text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold transition"
+          >
+            Explore {destination.name}
+          </Link>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
+</section>
 
       {/* Why Choose Us */}
       <section className="bg-gray-100 py-12 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Why Choose FMS Airways?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow">
-              <div className="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <FaPlaneDeparture className="text-blue-600 text-2xl" />
+            {[
+              {
+                icon: <FaPlaneDeparture className="text-blue-600 text-2xl" />,
+                title: "Modern Fleet",
+                desc: "Fly in comfort with our state-of-the-art aircraft featuring the latest amenities.",
+              },
+              {
+                icon: <FaSearch className="text-blue-600 text-2xl" />,
+                title: "Best Prices",
+                desc: "We guarantee the best prices for your flights or we'll match the difference.",
+              },
+              {
+                icon: <FaUser className="text-blue-600 text-2xl" />,
+                title: "24/7 Support",
+                desc: "Our customer service team is available around the clock to assist you.",
+              },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-6 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow"
+              >
+                <div className="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                <p className="text-gray-600">{item.desc}</p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Modern Fleet</h3>
-              <p className="text-gray-600">
-                Fly in comfort with our state-of-the-art aircraft featuring the latest amenities.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow">
-              <div className="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <FaSearch className="text-blue-600 text-2xl" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Best Prices</h3>
-              <p className="text-gray-600">
-                We guarantee the best prices for your flights or we'll match the difference.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md text-center hover:shadow-lg transition-shadow">
-              <div className="bg-blue-100 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                <FaUser className="text-blue-600 text-2xl" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">24/7 Support</h3>
-              <p className="text-gray-600">
-                Our customer service team is available around the clock to assist you.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Additional Components */}
+      {/* Additional Sections */}
       <SpecialOffers />
       <Testimonials />
       <FlightStatus />
@@ -182,7 +232,7 @@ export default function HomePage() {
       <FAQ />
       <Newsletter />
 
-      {/* CTA Section */}
+      {/* CTA */}
       <section className="bg-blue-700 text-white py-12 px-6 text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready for Your Next Adventure?</h2>

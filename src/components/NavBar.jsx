@@ -1,15 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
-import { FaPlaneDeparture } from "react-icons/fa";
+import { FaPlaneDeparture, FaBell, FaChevronDown } from "react-icons/fa";
 import { useState, useContext } from "react";
 import { UserContext } from "../context/UserContext";
 
-const currencies = ["KSH", "USD", "EUR", "GBP"];
-
-export default function NavBar({ selectedCurrency, setSelectedCurrency }) {
+export default function NavBar() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
   const [dropdown, setDropdown] = useState(false);
-  const [currencyDropdown, setCurrencyDropdown] = useState(false);
+  const [notificationCount, ] = useState(3); // Example count - fetch from backend
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -29,34 +27,20 @@ export default function NavBar({ selectedCurrency, setSelectedCurrency }) {
 
       <nav className="hidden md:flex items-center space-x-6 relative">
         <Link to="/" className="hover:text-blue-600 font-medium">Home</Link>
-        <Link to="/flights" className="hover:text-blue-600 font-medium">Search Flights</Link>
         <Link to="/about" className="hover:text-blue-600 font-medium">About</Link>
         <Link to="/contact" className="hover:text-blue-600 font-medium">Contact</Link>
 
-        <div className="relative">
-          <button
-            onClick={() => setCurrencyDropdown(!currencyDropdown)}
-            className="border border-blue-600 text-blue-600 px-4 py-1 rounded hover:bg-blue-600 hover:text-white transition"
-          >
-            {selectedCurrency}
-          </button>
-          {currencyDropdown && (
-            <div className="absolute right-0 mt-2 w-28 bg-white border rounded shadow-md z-50">
-              {currencies.map((cur) => (
-                <button
-                  key={cur}
-                  onClick={() => {
-                    setSelectedCurrency(cur);
-                    setCurrencyDropdown(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                >
-                  {cur}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Notification Icon that links to notifications page */}
+        {user && (
+          <Link to="/notifications" className="relative">
+            <FaBell className="text-xl text-gray-600 hover:text-blue-600" />
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {notificationCount}
+              </span>
+            )}
+          </Link>
+        )}
 
         {!user ? (
           <Link to="/login">
@@ -68,9 +52,10 @@ export default function NavBar({ selectedCurrency, setSelectedCurrency }) {
           <div className="ml-4 relative">
             <button
               onClick={() => setDropdown(!dropdown)}
-              className="border border-blue-600 text-blue-600 px-4 py-1 rounded hover:bg-blue-600 hover:text-white transition"
+              className="flex items-center space-x-1 border border-blue-600 text-blue-600 px-4 py-1 rounded hover:bg-blue-600 hover:text-white transition"
             >
-              {user.name}
+              <span>{user.name}</span>
+              <FaChevronDown className={`text-xs transition-transform ${dropdown ? 'transform rotate-180' : ''}`} />
             </button>
 
             {dropdown && (
