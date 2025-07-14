@@ -61,6 +61,7 @@ export default function DestinationMalindiPage() {
               "/images/malindi2.jpg",
               "/images/malindi3.jpg",
               "/images/malindi4.jpg",
+              "/images/malindi-promo.jpg",
             ].map((src, i) => (
               <img
                 key={i}

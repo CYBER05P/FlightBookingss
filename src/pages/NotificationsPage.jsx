@@ -15,7 +15,7 @@ export default function NotificationsPage() {
       try {
         if (!user || !user._id) return;
 
-        const response = await axios.get(`/api/notifications/user/${user._id}`, {
+        const response = await axios.get(`notifications/user/${user._id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -35,7 +35,7 @@ export default function NotificationsPage() {
 
   const markAsRead = async (id) => {
     try {
-      await axios.patch(`/api/notifications/${id}/read`, null, {
+      await axios.patch(`/notifications/${id}/read`, null, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -50,7 +50,7 @@ export default function NotificationsPage() {
 
   const deleteNotification = async (id) => {
     try {
-      await axios.delete(`/api/notifications/${id}`, {
+      await axios.delete(`/notifications/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -63,7 +63,7 @@ export default function NotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      await axios.patch("/api/notifications/mark-all-read", null, {
+      await axios.patch("/notifications/mark-all-read", null, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
