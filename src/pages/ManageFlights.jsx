@@ -64,7 +64,7 @@ export default function ManageFlights() {
         await axios.put(`/flights/${editId}`, flightForm);
         setEditId(null);
       } else {
-        await axios.post("/flights", flightForm);
+        await axios.post("flights", flightForm);
       }
       fetchFlights();
       setFlightForm({
