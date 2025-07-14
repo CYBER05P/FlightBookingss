@@ -1,23 +1,31 @@
 // src/pages/Contact.jsx
 import React, { useState } from "react";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaPaperPlane } from "react-icons/fa";
+import axios from "../axiosConfig";
 
 export default function Contact() {
+  const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000); // Reset after 4 seconds
+
+    try {
+      await axios.post("/complaints", { message }); // no userId sent
+      setSubmitted(true);
+      setMessage("");
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send message. Please try again.");
+    }
   };
 
   return (
-          <div
-          className="min-h-screen py-16 px-6 bg-cover bg-center"
-          style={{ backgroundImage: `url('/images/contact-bg.jpg')` }}
-          >
-
-
+    <div
+      className="min-h-screen py-16 px-6 bg-cover bg-center"
+      style={{ backgroundImage: "url('/images/contact-bg.jpg')" }}
+    >
       <div className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
         <h1 className="text-3xl md:text-4xl font-bold text-blue-700 text-center mb-6">
           Contact Us
@@ -65,23 +73,10 @@ export default function Contact() {
         </div>
 
         {/* Contact Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="grid gap-6 md:grid-cols-2"
-        >
-          <input
-            type="text"
-            placeholder="Your Name"
-            required
-            className="p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-          <input
-            type="email"
-            placeholder="Your Email"
-            required
-            className="p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
+        <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-2">
           <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             placeholder="Your Message"
             rows="5"
             required

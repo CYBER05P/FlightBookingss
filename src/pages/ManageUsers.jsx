@@ -28,14 +28,37 @@ export default function ManageUsers() {
     }
   };
 
-  const handleDeactivate = async (id) => {
-    if (!window.confirm("Deactivate this user?")) return;
+  const handleToggleActive = async (id, isActive) => {
+    if (!window.confirm(isActive ? "Deactivate this user?" : "Activate this user?")) return;
     try {
-      await axios.put(`/api/admin/users/${id}/deactivate`);
+      await axios.put(`/api/admin/users/${id}/toggle-active`);
       fetchUsers();
     } catch (err) {
       console.error(err);
-      alert("Failed to deactivate user");
+      alert("Failed to toggle user status");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await axios.delete(`/api/admin/users/${id}`);
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete user");
+    }
+  };
+
+  const handleSendMessage = async (id) => {
+    const message = window.prompt("Enter message to send:");
+    if (!message) return;
+    try {
+      await axios.post(`/api/admin/users/${id}/send-message`, { message });
+      alert("Message sent successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to send message");
     }
   };
 
@@ -60,21 +83,31 @@ export default function ManageUsers() {
               <td className="p-2 border">{u.email}</td>
               <td className="p-2 border">{u.role}</td>
               <td className="p-2 border">{u.active ? "Active" : "Deactivated"}</td>
-              <td className="p-2 border space-x-2">
+              <td className="p-2 border space-x-1">
                 <button
                   onClick={() => handleRoleChange(u.id, u.role === "admin" ? "user" : "admin")}
-                  className="bg-blue-600 text-white px-2 py-1 rounded"
+                  className="bg-blue-600 text-white px-2 py-1 rounded text-xs"
                 >
-                  {u.role === "admin" ? "Demote to User" : "Promote to Admin"}
+                  {u.role === "admin" ? "Demote" : "Promote"}
                 </button>
-                {u.active && (
-                  <button
-                    onClick={() => handleDeactivate(u.id)}
-                    className="bg-red-600 text-white px-2 py-1 rounded"
-                  >
-                    Deactivate
-                  </button>
-                )}
+                <button
+                  onClick={() => handleToggleActive(u.id, u.active)}
+                  className="bg-yellow-500 text-white px-2 py-1 rounded text-xs"
+                >
+                  {u.active ? "Deactivate" : "Activate"}
+                </button>
+                <button
+                  onClick={() => handleDelete(u.id)}
+                  className="bg-red-600 text-white px-2 py-1 rounded text-xs"
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => handleSendMessage(u.id)}
+                  className="bg-gray-600 text-white px-2 py-1 rounded text-xs"
+                >
+                  Send Message
+                </button>
               </td>
             </tr>
           ))}
