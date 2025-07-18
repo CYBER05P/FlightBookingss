@@ -2,6 +2,7 @@ package com.Brinah.FlightBooking.Controller;
 
 import com.Brinah.FlightBooking.DTO.BookingRequest;
 import com.Brinah.FlightBooking.DTO.BookingDto;
+import com.Brinah.FlightBooking.DTO.BookingStatsDto;
 import com.Brinah.FlightBooking.Entity.Booking;
 import com.Brinah.FlightBooking.Exception.ResourceNotFoundException;
 import com.Brinah.FlightBooking.Repositories.BookingRepository;
@@ -49,12 +50,17 @@ public class BookingController {
         return ResponseEntity.ok("Booking cancelled");
     }
 
-    // ✅ View current user's bookings
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @GetMapping("/my")
-    public ResponseEntity<List<BookingDto>> myBookings(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(bookingService.getBookingsForUser(userDetails.getUsername()));
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BookingDto>> getBookingsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(bookingService.getBookingsByUserId(userId));
     }
+    @GetMapping("/admin/stats/aircraft-bookings")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<BookingStatsDto>> getBookingStats() {
+        return ResponseEntity.ok(bookingService.getBookingStats());
+    }
+
 
     // ✅ Download ticket PDF
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

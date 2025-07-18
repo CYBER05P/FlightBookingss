@@ -1,7 +1,7 @@
 package com.Brinah.FlightBooking.DTO;
 
+import com.Brinah.FlightBooking.Enum.FlightStatus;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data
@@ -12,16 +12,24 @@ public class FlightCreationDto {
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
 
-    // Required relationships by ID
-    private Long aircraftId;
-    private Long departureAirportId;
-    private Long arrivalAirportId;
+    private String departureCity;
+    private String departureCountry;
+    private String arrivalCity;
+    private String arrivalCountry;
 
-    // Prices that will go into the Route
+    private String departureAirportName;
+    private String arrivalAirportName;
+
+    private String aircraftModel;
+
     private double economyPrice;
     private double businessPrice;
     private double firstClassPrice;
 
-    // Optional flight ID (if needed for updates)
-    private Long id;
+    // ✅ Add these fields for seat configuration
+    private int economySeats;
+    private int businessSeats;
+    private int firstClassSeats;
+
+    private FlightStatus flightStatus;  // ✅ Added manually settable status
 }

@@ -1,8 +1,12 @@
 package com.Brinah.FlightBooking.DTO;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class AirportDto {
     private Long id;
     private String name;

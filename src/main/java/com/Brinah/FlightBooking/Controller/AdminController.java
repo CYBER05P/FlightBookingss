@@ -1,10 +1,10 @@
 package com.Brinah.FlightBooking.Controller;
 
-import com.Brinah.FlightBooking.DTO.AircraftDto;
-import com.Brinah.FlightBooking.DTO.AirportDto;
-import com.Brinah.FlightBooking.DTO.RouteDto;
-import com.Brinah.FlightBooking.DTO.UserDto;
+import com.Brinah.FlightBooking.DTO.*;
 import com.Brinah.FlightBooking.Service.Interface.AdminService;
+import com.Brinah.FlightBooking.Service.Interface.FlightService;
+import com.Brinah.FlightBooking.Service.Interface.UserService;
+import com.Brinah.FlightBooking.Service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +18,11 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final UserService userService;
+    private final NotificationService notificationService;
+    private final FlightService flightService;
+
+    // ===== Aircraft Endpoints =====
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/aircrafts")
@@ -41,6 +46,15 @@ public class AdminController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/aircrafts/{id}")
+    public ResponseEntity<String> deleteAircraft(@PathVariable Long id) {
+        adminService.deleteAircraft(id);
+        return ResponseEntity.ok("✅ Aircraft deleted successfully.");
+    }
+
+    // ===== Airport Endpoints =====
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/airports")
     public ResponseEntity<AirportDto> addAirport(@RequestBody AirportDto dto) {
         return ResponseEntity.ok(adminService.addAirport(dto));
@@ -62,20 +76,41 @@ public class AdminController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/routes")
-    public ResponseEntity<RouteDto> addRoute(@RequestBody RouteDto dto) {
-        return ResponseEntity.ok(adminService.addRoute(dto));
+    @DeleteMapping("/airports/{id}")
+    public ResponseEntity<String> deleteAirport(@PathVariable Long id) {
+        adminService.deleteAirport(id);
+        return ResponseEntity.ok("✅ Airport deleted successfully.");
     }
 
+    // ===== Notification Endpoint =====
+
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/routes")
-    public ResponseEntity<List<RouteDto>> getAllRoutes() {
-        return ResponseEntity.ok(adminService.getAllRoutes());
+    @PostMapping("/notify")
+    public ResponseEntity<String> sendNotification(@RequestBody NotificationRequest request) {
+        notificationService.notifyAllSubscribers(request.getSubject(), request.getMessage());
+        return ResponseEntity.ok("✅ Notifications sent to all subscribed users.");
     }
+
+    // ===== User Management (ADMIN only) =====
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok("✅ User deleted successfully.");
+    }
+
+    // ===== Flight Statistics =====
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/flight-stats")
+    public ResponseEntity<List<FlightStatsDto>> getFlightStats() {
+        return ResponseEntity.ok(flightService.getFlightStatistics());
     }
 }

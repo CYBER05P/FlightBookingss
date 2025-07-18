@@ -13,19 +13,19 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // apply to all endpoints
+                registry.addMapping("/**")
                         .allowedOrigins(
-                                "http://localhost:5500",   // for Live Server (VS Code)
-                                "http://127.0.0.1:5500",   // alternate live-server address
-                                "http://localhost:3000",   // for React
-                                "http://127.0.0.1:3000"    // alternate React dev server
+                                "http://localhost:5500",
+                                "http://127.0.0.1:5500",
+                                "http://localhost:3000",
+                                "http://127.0.0.1:3000"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true); // allow cookies or Authorization headers
+                        .exposedHeaders("Authorization")
+                        .allowCredentials(true)
+                        .maxAge(3600);
             }
         };
     }
 }
-
-

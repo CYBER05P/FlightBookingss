@@ -11,7 +11,6 @@ import com.Brinah.FlightBooking.Utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +25,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
+        // Prevent duplicate email
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already in use");
         }
 
+        // Build and save new user
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
@@ -37,46 +38,53 @@ public class AuthServiceImpl implements AuthService {
                 .idOrPassportNumber(request.getIdOrPassportNumber())
                 .dateOfBirth(request.getDateOfBirth())
                 .country(request.getCountry())
-                .role(request.getRole() != null ? Role.valueOf(request.getRole().toUpperCase()) : Role.USER)
+                .role(request.getRole() != null ? Role.valueOf(request.getRole().toUpperCase()) : Role.CUSTOMER)
                 .enabled(true)
+                .subscribedToNotifications(false)
                 .build();
 
         userRepository.save(user);
 
+        // Generate token
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
 
+        // Return full user info in response
         return AuthResponse.builder()
+                .name(user.getName())
                 .email(user.getEmail())
+                .idOrPassport(user.getIdOrPassportNumber())
+                .dateOfBirth(user.getDateOfBirth())
+                .country(user.getCountry())
+                .role(user.getRole().name())
                 .token(token)
                 .Message("Registration successful")
-                .role(user.getRole().name())
                 .build();
-
     }
 
     @Override
     public AuthResponse login(LoginRequest request) {
+        // Authenticate credentials
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
+        // Find user
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Generate token
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
 
+        // Return full user info
         return AuthResponse.builder()
                 .name(user.getName())
+                .email(user.getEmail())
                 .idOrPassport(user.getIdOrPassportNumber())
                 .dateOfBirth(user.getDateOfBirth())
                 .country(user.getCountry())
-                .email(user.getEmail())
+                .role(user.getRole().name())
                 .token(token)
                 .Message("Login successful")
-                .role(user.getRole().name())
                 .build();
-
     }
 }
-
-        

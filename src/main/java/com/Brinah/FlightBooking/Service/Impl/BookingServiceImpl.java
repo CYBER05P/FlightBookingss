@@ -1,7 +1,9 @@
+
 package com.Brinah.FlightBooking.Service.Impl;
 
 import com.Brinah.FlightBooking.DTO.BookingDto;
 import com.Brinah.FlightBooking.DTO.BookingRequest;
+import com.Brinah.FlightBooking.DTO.BookingStatsDto;
 import com.Brinah.FlightBooking.Entity.Booking;
 import com.Brinah.FlightBooking.Entity.Flight;
 import com.Brinah.FlightBooking.Entity.Seat;
@@ -63,11 +65,13 @@ public class BookingServiceImpl implements BookingService {
         seatRepository.saveAll(assignedSeats);
 
         // Price calculation
+        // Price calculation using flight's pricing config
         double pricePerSeat = switch (request.getSeatClass()) {
-            case FIRST -> 500.0;
-            case BUSINESS -> 350.0;
-            case ECONOMY -> 200.0;
+            case FIRST -> flight.getFirstClassPrice();
+            case BUSINESS -> flight.getBusinessPrice();
+            case ECONOMY -> flight.getEconomyPrice();
         };
+
         double totalPrice = pricePerSeat * totalPassengers;
 
         // Save booking
@@ -99,6 +103,14 @@ public class BookingServiceImpl implements BookingService {
         // Deprecated in favor of BookingRequest approach
         return null;
     }
+    @Override
+    public List<BookingDto> getBookingsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "ID", userId));
+        List<Booking> bookings = bookingRepository.findByUser(user);
+        return bookings.stream().map(modelMapper::toBookingDto).toList();
+    }
+
 
     @Override
     @Transactional
@@ -129,6 +141,11 @@ public class BookingServiceImpl implements BookingService {
                 .map(modelMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<BookingStatsDto> getBookingStats() {
+        return bookingRepository.getBookingStatsPerAircraft();
+    }
+
 
     @Override
     public List<BookingDto> getAllBookings() {

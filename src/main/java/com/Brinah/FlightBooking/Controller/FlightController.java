@@ -1,9 +1,7 @@
 package com.Brinah.FlightBooking.Controller;
 
-import com.Brinah.FlightBooking.DTO.FlightCreationDto;
-import com.Brinah.FlightBooking.DTO.FlightDto;
-import com.Brinah.FlightBooking.DTO.FlightResponse;
-import com.Brinah.FlightBooking.DTO.FlightSearchRequest;
+import com.Brinah.FlightBooking.DTO.*;
+import com.Brinah.FlightBooking.Repositories.AirportRepository;
 import com.Brinah.FlightBooking.Service.Interface.FlightService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +14,9 @@ import java.util.List;
 @RequestMapping("/api/flights")
 @RequiredArgsConstructor
 public class FlightController {
+
     private final FlightService flightService;
+    private final AirportRepository airportRepository;
 
     /**
      * Create a new flight (Admin only).
@@ -26,7 +26,6 @@ public class FlightController {
     public ResponseEntity<FlightDto> createFlight(@RequestBody FlightCreationDto dto) {
         return ResponseEntity.ok(flightService.createFlight(dto));
     }
-
 
     /**
      * Get all flights (Admin & Customer).
@@ -54,6 +53,28 @@ public class FlightController {
     public ResponseEntity<String> deleteFlight(@PathVariable Long id) {
         flightService.deleteFlight(id);
         return ResponseEntity.ok("Flight deleted");
+    }
+
+    /**
+     * Delete all flights (Admin only).
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/deleteAll")
+    public ResponseEntity<String> deleteAllFlights() {
+        flightService.deleteAllFlights();
+        return ResponseEntity.ok("All flights and their bookings have been deleted");
+    }
+
+    /**
+     * Get all airports for dropdown (no auth required).
+     */
+    @GetMapping("/dropdown")
+    public ResponseEntity<List<AirportDto>> getAirportsForDropdown() {
+        List<AirportDto> airports = airportRepository.findAllByOrderByNameAsc()
+                .stream()
+                .map(a -> new AirportDto())
+                .toList();
+        return ResponseEntity.ok(airports);
     }
 
     /**
